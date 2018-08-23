@@ -72,4 +72,19 @@ int socket_connect(int port, char*host) {
     return socketfd;
 }
 
+int get_con_val(char *pathname, char *key_name, char *val) {
+    FILE*fp;
+    char*temp;
+    char arm[100];
+    int flag = 0;
+    if (!(fp = fopen(pathname, "r"))) perror("fopen"), exit(1);
+    while (fscanf(fp, "%s", arm) != EOF) {
+        if ((temp = strtok(arm, "=")) && !strcmp(temp, key_name) && !flag++) 
+            strncpy(val, strtok(NULL, "="), strlen(val));
+    }
+    fclose(fp);
+    flag ? printf("get value success: %s->%s\n", key_name, val) : printf("%s: can't get value\n", __func__);
+    return flag; 
+}
+
 #endif

@@ -1,5 +1,5 @@
 /*************************************************************************
-	> File Name: main.c
+	> File Name: server.c
 	> Author: Daniel
 	> Mail: 292382967@qq.com
 	> Created Time: 日  6/10 15:03:23 2018
@@ -16,7 +16,7 @@ int main() {
         perror("socket_create");
         return 1;
     }
-    printf("======waiting for client's request======\n"); 
+    printf("waiting for client's request\n"); 
         if ((connfd = accept(socketfd, (struct sockaddr*)NULL, NULL)) == -1) { 
         perror("accept");
         return 1;
