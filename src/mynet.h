@@ -27,17 +27,7 @@
 #include <signal.h>
 #include <unistd.h>
 
-#define RETURN(a) {perror(#a); return 1;}
-#define BREAK(a) {perror(#a); break;}
 #define MAXLINE 4096 
-#define PIPATH "../pihealthd.conf"
-#define LOCALHOST "127.0.0.1"
-#define true 1
-#define false 0
-
-int socket_create(int port);
-int socket_connect(int port, char*host);
-char *get_con_val(char *key_name);
 
 int socket_create(int port) {
     int socketfd;
@@ -82,20 +72,19 @@ int socket_connect(int port, char*host) {
     return socketfd;
 }
 
-char *get_con_val(char *key_name) {
+int get_con_val(char *pathname, char *key_name, char *val) {
     FILE*fp;
-    char*temp, arm[100], *ans = NULL;
-    if (!(fp = fopen(PIPATH, "r"))) perror("fopen"), exit(1);
+    char*temp;
+    char arm[100];
+    int flag = 0;
+    if (!(fp = fopen(pathname, "r"))) perror("fopen"), exit(1);
     while (fscanf(fp, "%s", arm) != EOF) {
-        if ((temp = strtok(arm, "=")) && !strcmp(temp, key_name) && !ans) { 
-            temp = strtok(NULL, "=");
-            ans = (char *)malloc(sizeof(char) * strlen(temp));
-            strcpy(ans, temp);
-        }
+        if ((temp = strtok(arm, "=")) && !strcmp(temp, key_name) && !flag++) 
+            strncpy(val, strtok(NULL, "="), strlen(val));
     }
     fclose(fp);
-    ans ? printf("get value success: %s->%s\n", key_name, ans) : printf("%s: can't get value\n", __func__);
-    return ans; 
+    flag ? printf("get value success: %s->%s\n", key_name, val) : printf("%s: can't get value\n", __func__);
+    return flag; 
 }
 
 #endif

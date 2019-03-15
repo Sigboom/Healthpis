@@ -2,63 +2,50 @@
 	> File Name: client.c
 	> Author: Daniel
 	> Mail: 292382967@qq.com
-	> Created Time: 日  6/10 15:03:23 2018
+	> Created Time: 日  6/10 20:27:36 2018
  ************************************************************************/
 
 #include "mynet.h"
 
-int catch_conn();
-int send_file(int connfd, char *filename);
+int main(int argc, char** argv) {
+    int port;
+    char*host;
+    if (argc == 1) {
+        return 0;
+    } else if (argc == 2) {
+        host = argv[1];
+        port = 6666;
+    } else {
+        host = argv[1];
+        port = atoi(argv[2]);
+    }
 
-int main() {
-    int socketfd, connfd, shortfd;
-    int client_port = atoi(get_con_val("client_port"));
-    int file_port = atoi(get_con_val("file_port"));
-    if ((socketfd = socket_create(client_port)) < 0) RETURN(socket_create);
-    if ((shortfd = socket_create(file_port)) < 0) RETURN(socket_create);
-    while (true) {
-        if (!(connfd = catch_conn(socketfd))) BREAK(catch_conn);
-        while (true) {
-            char buffer[MAXLINE];
-            bzero(buffer, sizeof(buffer));
+    int socketfd;
+    if ((socketfd = socket_connect(port, host)) == -1) {
+        perror("socket_connect");
+        exit(1);
+    } 
+    char buffer[MAXLINE];
+    memset(buffer, 0, sizeof(buffer));
+    int pid = fork();
+    if (pid > 0) {
+        while (1) {
+            scanf("%s", buffer);
             int n;
-            if ((n = recv(connfd, buffer, MAXLINE, 0)) < 0) BREAK(recv);
-            if (n == 0) BREAK(recv_0);
-            int pid = fork();
-            if (pid < 0) RETURN(fork);
-            if (pid == 0) {
-                int filefd = 0;
-                if (!(filefd = catch_conn(shortfd))) BREAK(catch_conn);
-                if (!send_file(filefd, buffer)) BREAK(send_file);
-                close(filefd);
-                return 0;
+            if ((n = send(socketfd, buffer, strlen(buffer), 0)) == -1) {
+                perror("send");
+                exit(1);
             }
         }
-    } 
-    close(shortfd);
-    close(socketfd); 
-    return 0;
-}
-
-int catch_conn(int socketfd) {
-    int connfd = 0;
-    printf("~~~~~Waiting for client's request~~~~~\n"); 
-    if ((connfd = accept(socketfd, (struct sockaddr*)NULL, NULL)) < 0) return 0;
-    printf("~~~~~connect succeed!~~~~~\n");
-    return connfd;
-}
-
-int send_file(int connfd, char *filename) {
-    FILE *fp = NULL;
-    if ((fp = fopen(filename, "r")) == NULL) return 0;
-    int length = 0;
-    char *buffer[MAXLINE];
-    bzero(buffer, sizeof(buffer));
-    while ((length = fread(buffer, sizeof(char), sizeof(buffer), fp)) > 0) {
-        if (send(connfd, buffer, length, 0) < 0) return 0;
-        bzero(buffer, sizeof(buffer));
+    } else {
+        while (1) {
+            if ((recv(socketfd, buffer, MAXLINE, 0)) == -1) {
+                perror("recv");
+                exit(1);
+            }
+            puts(buffer);
+        }
     }
-    fclose(fp);
-    printf("send over!\n");
-    return 1;
+    close(socketfd);
+    return 0;
 }
