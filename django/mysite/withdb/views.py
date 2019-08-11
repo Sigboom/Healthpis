@@ -48,7 +48,7 @@ def register(request):
         return HttpResponse(json.dumps({'code': 0, 'msg': '发生未知错误'}), content_type="application/json")
 
 def getusers(request):
-    user_list = models.UserInfo.objects.all()
+    user_list = models.UserInfo.objects.using('userdb').all()
     list = []
 
     for i in user_list:
