@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from withdb import views as db_views
+from templates import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,4 +24,5 @@ urlpatterns = [
     path('user/', db_views.index),
     path('user/register', db_views.register),
     path('user/getusers', db_views.getusers),
+    path('hello/', views.hello),
 ]
