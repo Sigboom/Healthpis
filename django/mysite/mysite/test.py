@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import os
-
-print(os.path.dirname(os.path.abspath(__file__)))
+def application(env, start_response):
+    start_response('200 OK', [('Content-Type','text/html')])
+    return [b"Hello World"]
