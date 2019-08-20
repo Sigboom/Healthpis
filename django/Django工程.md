@@ -19,6 +19,15 @@ pip install nginx
 conda create -n <env_name> python=<python_version>
 # python_version => 2.7/3.6...
 
+#删除虚拟环境
+#已在当前环境无法直接删除
+conda remove -n <env_name> --all
+
+#复制（克隆环境）
+conda create -n <new_env_name> --clone <old_env_name>
+
+#复制+删除=>重命名
+
 #查看当前已有环境
 conda env list
 
