@@ -1,11 +1,75 @@
 #使用Django记录
 ##基本安装：
-```py
+```sh
 # 安装Django
 pip install django
 
 #安装uwsgi
 pip install uwsgi
+```
+##安装配置mysql
+
+```sh
+#在本机中安装mysql
+brew install mysql 
+
+#安装python 与MySQL 的链接模块（使用anaconda会安装在anaconda环境中）
+pip install pymysql
+```
+- 在\_\_init__.py中添加
+
+```
+import pymysql
+
+pymysql.install_as_MySQLdb()
+```
+- 修改setting.py文件配置
+找到DATABASES,修改为
+
+```py
+#根据具体安装mysql配置修改参数
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'achievements',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': '127.0.0.1',
+        'PORT': 3306,
+    }
+}
+```
+
+- 会出现问题，参考[文章](https://blog.csdn.net/weixin_33127753/article/details/89100552)
+- 进入anaconda环境中的mysql文件下（一般在\<env_name>/lib/\<python_version>/site-packages/django/db/backends/mysql）
+- 注释掉base.py文件下
+
+```py
+if version < (1, 3, 3):
+     raise ImproperlyConfigured("mysqlclient 1.3.3 or newer is required; you have %s" % Database.__version__)
+```
+修改operations.py文件
+
+```py
+if query is not None:
+    query = query.decode(errors='replace')
+return query
+# 修改为：
+if query is not None:
+    query = query.encode(errors='replace')
+return query
+```
+- 出现"cryptography is required for sha256_password or caching_sha2_password"问题
+
+```sh
+pip install cryptography
+```
+- 出现"Unknown database '*******'", 在mysql中创建相关database
+
+```sh
+#记得更新数据库
+python manage.py makemigrations 
+python manage.py migrate
 ```
 ##部署使用安装：
 ```py
