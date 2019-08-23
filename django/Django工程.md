@@ -77,7 +77,15 @@ pip install nginx
 ```
 
 ##其他常用命令
-###使用anaconda
+###安装使用anaconda
+- Linux系统安装：
+
+```sh
+wget https://repo.anaconda.com/archive/Anaconda3-2018.12-Linux-x86_64.sh
+sudo bash Anaconda3-2018.12-Linux-x86_64.sh
+#继续安装即可（目录可以进行修改）
+```
+
 ```sh
 #创建虚拟环境
 conda create -n <env_name> python=<python_version>
