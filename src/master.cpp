@@ -1,106 +1,100 @@
 /*************************************************************************
 	> File Name: master.cpp
-	> Author: 
-	> Mail: 
-	> Created Time: 二  8/27 21:26:23 2019
+	> Author: Doni Daniel
+	> Mail: sigboom@163.com
+	> Created Time: 三  8/28 21:07:07 2019
  ************************************************************************/
 
-#include<iostream>
-using namespace std;
+#include <iostream>
+#include <string.h>
+#include <string>
+#include "mynet.h"
 
-class Window {
-public:
-    Windows (View *contents);
-
-    virtual void drawContents();
-
-    virtual void open();
-    virtual void close();
-    virtual void iconofy();
-    virtual void deiconify();
-
-    virtual void setOrigin(const Point &at);
-    virtual void setExtent(const Point &extent);
-    virtual void raise();
-    virtual void lower();
-    virtual void drawLine(const Point &, const Point &);
-    virtual void drawRect(const Point &, const Point &);
-    virtual void drawPolygon(const Point[], int n);
-    virtual void DrawText(const char *, const Point &);
-
-protected:
-    WindowImp *getWindowImp();
-    View *getView();
-private:
-    WindowImp *_imp;
-    View *_contents;
-};
-
-class WindowsImp {
-public:
-    virtual void impTop() = 0;
-    virtual void impBottom() = 0;
-    virtual void impSetExtent(const Point &) = 0;
-    virtual void impSetOrigin(const Point &) = 0;
-
-    virtual void deviceRect(Coord, Coord, Coord, Coord) = 0;
-    virtual void deviceText(const char *, Coord, Coord) = 0;
-    virtual void deviceBitmap(const char *, Coord, Coord) = 0;
-    //other function
-protected:
-    WindowImp();
-};
-
-class ApplicationWindow : public Window {
-public:
-    //...
-    virtual void drawContents();
-};
-
-void ApplicationWindow::drawContents() {
-    GetView()->DrawOn(this);
-}
-
-class IconWindow : public Window {
-public:
-    //...
-    virtual void drawContents();
-private:
-    const char *_bitmapName;
-};
-
-void IconWindow::drawContents() {
-    WindowImp *imp = GetWindowImp();
-    if (imp != 0) {
-        imp->deviceBitmap(_bitmapName, 0.0, 0.0);
+namespace monitor {
+    int hello() {
+        std::cout << "Hello World!" << std::endl;
+        return 0;
     }
 }
 
-void Window::drawRect(const Point &p1, const Point &p2) {
-    WindowImp *imp = getWindowImp();
-    imp->deviceRect(p1.X(), p1.Y(), p2.X(), p2.Y());
+class waiter {
+public:
+    waiter(int port) : port(port), socketfd(0), connfd(0){
+        initialize();
+        if ((socketfd = socket_create(port)) == -1) {
+            err = "socket_create";
+        }
+        if (err.length()) {
+            std::cout << err << std::endl;
+        } else {
+            std::cout << "Waiting for client's request" << std::endl;
+        }
+    }
+
+    void initialize() {
+        recv_buff.clear();
+        send_buff.clear();
+    }
+
+    int accept_node() {
+        if ((connfd = accept(socketfd, 
+                        (struct sockaddr *)NULL, 
+                        NULL)) == -1) {
+            err = "accept";
+            std::cout << err << std::endl;
+            return -1;
+        }
+        int pid = fork();
+        if (pid) return pid;
+        
+        while (is_exit(recv_buff)) {
+            recv_buff.clear();
+            int len = recv(connfd, recv_buff, MAXLINE, 0);
+            if (len <= 0) break;
+            std::cout << recv_buff;
+        }
+        return 0;
+    }
+
+    bool is_exit(std::string order) {
+        return order != "exit";
+    }
+
+    int get_order() {
+        while (is_exit(send_buff)) {
+            send_buff.clear();
+            std::cin >> send_buff;
+            int len = send(connfd, send_buff, MAXLINE, 0);
+            if (len <= 0) break;
+        }
+    }
+
+    int call_runner() {
+        return 0;
+    }
+
+    int have_rest() {
+        return 0;
+    }
+
+    ~waiter() {
+        close(connfd);
+        close(socketfd);
+    }
+    
+private:
+    int port;
+    int socketfd;
+    int connfd;
+    std::string err;
+    std::string recv_buff, send_buff;
+};
+
+int main() {
+    int port = 5555;
+    waiter *doni = new waiter(port);
+    std::cout << "pid = " << doni->accept_node() << std::endl;
+    doni->get_order();
+    delete doni;
+    return monitor::hello();
 }
-
-class XWindowImp : public WindowImp {
-public:
-    XWindowImp();
-
-    virtual void deviceRect(Coord, Coord, Coord, Coord);
-    //remainder of public interface
-private:
-    //X Window system-specific state
-    Display *_dpy;
-    Drawable _winid;
-    GC _gc;
-};
-
-class PMWindowImp : public WndowImp {
-public:
-    PMWindowImp();
-    virtual void deviceRect(Coord, Coord, Coord, Coord);
-
-    //remainder of public interface...
-private:
-    //lots of PM Window system-specific state
-    HPS _hps;
-};
