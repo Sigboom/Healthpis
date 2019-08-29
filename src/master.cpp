@@ -49,7 +49,7 @@ public:
         
         while (is_exit(recv_buff)) {
             recv_buff.clear();
-            int len = recv(connfd, recv_buff, MAXLINE, 0);
+            int len = recv(connfd, (void *)recv_buff.c_str(), MAXLINE, 0);
             if (len <= 0) break;
             std::cout << recv_buff;
         }
@@ -64,9 +64,10 @@ public:
         while (is_exit(send_buff)) {
             send_buff.clear();
             std::cin >> send_buff;
-            int len = send(connfd, send_buff, MAXLINE, 0);
+            int len = send(connfd, send_buff.c_str(), MAXLINE, 0);
             if (len <= 0) break;
         }
+        return 0;
     }
 
     int call_runner() {
