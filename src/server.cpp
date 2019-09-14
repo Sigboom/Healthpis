@@ -47,7 +47,7 @@ public:
         int pid = fork();
         if (pid) return pid;
         
-        while (is_exit(recv_buff)) {
+        while (!is_exit(recv_buff)) {
             recv_buff.clear();
             int len = recv(connfd, (void *)recv_buff.c_str(), MAXLINE, 0);
             if (len <= 0) break;
@@ -57,17 +57,17 @@ public:
     }
 
     bool is_exit(std::string order) {
-        return order != "exit";
+        return order == "exit";
     }
 
-    int get_order() {
-        while (is_exit(send_buff)) {
+    void get_order() {
+        while (!is_exit(send_buff)) {
             send_buff.clear();
             std::cin >> send_buff;
-            int len = send(connfd, send_buff.c_str(), MAXLINE, 0);
+            int len = send(connfd, send_buff.c_str(), send_buff.length(), 0);
             if (len <= 0) break;
         }
-        return 0;
+        return ;
     }
 
     int call_runner() {

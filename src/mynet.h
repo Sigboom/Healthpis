@@ -52,7 +52,7 @@ int socket_create(int port) {
     return socketfd;
 }
 
-int socket_connect(int port, char*host) {
+int socket_connect(int port, const char *host) {
     int socketfd;
     struct sockaddr_in dest_addr;
     if ((socketfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
