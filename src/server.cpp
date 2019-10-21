@@ -1,5 +1,5 @@
 /*************************************************************************
-	> File Name: master.cpp
+	> File Name: server.cpp
 	> Author: Doni Daniel
 	> Mail: sigboom@163.com
 	> Created Time: 三  8/28 21:07:07 2019
@@ -8,7 +8,13 @@
 #include <iostream>
 #include <string.h>
 #include <string>
+#include "conf.h"
 #include "mynet.h"
+
+using std::cin;
+using std::cout;
+using std::endl;
+using std::string;
 
 namespace monitor {
     int hello() {
@@ -19,7 +25,7 @@ namespace monitor {
 
 class waiter {
 public:
-    waiter(int port) : port(port), socketfd(0), connfd(0){
+    waiter(string confPath) : port(port), socketfd(0), connfd(0){
         initialize();
         if ((socketfd = socket_create(port)) == -1) {
             err = "socket_create";
@@ -92,10 +98,11 @@ private:
 };
 
 int main() {
-    int port = 5555;
-    waiter *doni = new waiter(port);
+    waiter *doni = new waiter("manager.conf");
+    /*
     std::cout << "pid = " << doni->accept_node() << std::endl;
     doni->get_order();
     delete doni;
+    */
     return monitor::hello();
 }
