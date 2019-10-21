@@ -8,7 +8,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "conf.h"
 #include "mynet.h"
 
 using std::cin;
