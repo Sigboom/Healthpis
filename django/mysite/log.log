@@ -1,2 +1,0 @@
-username = 123456, pw = 123456, error = type object 'UserInfo' has no attribute 'object'username = 123456, pw = 123456, error = type object 'UserInfo' has no attribute 'object'username = 123456, pw = 123456, error = no such table: withdb_userinfousername = 123456, pw = 123456, error = no such table: withdb_userinfo
-username = 123456, pw = 123456, error = no such table: withdb_userinfo
