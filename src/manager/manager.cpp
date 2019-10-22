@@ -1,14 +1,15 @@
 /*************************************************************************
-	> File Name: client.cpp
+	> File Name: manager.cpp
 	> Author: Doni Daniel
 	> Mail: sigboom@163.com
-	> Created Time: 二  9/ 3 17:52:21 2019
+	> Created Time: 二  10/ 22 17:52:21 2019
  ************************************************************************/
 
 #include <iostream>
 #include <string>
 #include <vector>
-#include "mynet.h"
+#include "../include/baseTools.h"
+#include "../include/sigNet.h"
 
 using std::cin;
 using std::cout;
@@ -16,6 +17,7 @@ using std::endl;
 using std::unique_ptr;
 using std::vector;
 using std::string;
+using std::move;
 
 namespace monitor {
     int byebye() {
@@ -34,30 +36,36 @@ typedef struct ServerNode {
     int connfd;
 } ServerNode;
 
-class manager {
+class manager : public sigNet {
 private:
-    string confPath;
     unique_ptr<ServerNode[]> servers;
+    unique_ptr<baseTools> bt;
     int serverCounter;
     int pid;
     
 public:
-    manager(string confPath) : serverCounter(0), confPath(confPath){
-        //cout << getConf("num") << endl;
-        serverCounter = std::stoi(getConf("num"));
-        unique_ptr<ServerNode[]> m_temp(new ServerNode[serverCounter]);
-        servers = std::move(m_temp);
-        string serverDis = getConf("servers");
+    manager(string confPath) : serverCounter(0) {
+        unique_ptr<baseTools> b_temp (new baseTools(confPath));
+        bt = move(b_temp);
+        string str_temp = bt->getConf("num");
+        if (str_temp.empty()) {
+            cout << "conf error!" << endl;
+            exit(1);
+        }
+        serverCounter = std::stoi(str_temp);
+        unique_ptr<ServerNode[]> s_temp(new ServerNode[serverCounter]);
+        servers = move(s_temp);
+        string serverDis = bt->getConf("servers");
         initServers(serverDis);
         cout << "manager init Successful!" << endl;
     }
     ~manager() {}
     
     void initServers(string serverDis) {
-        vector<string> serversData = split(serverDis, ",");
+        vector<string> serversData = bt->split(serverDis, ",");
         int counter = 0;
         for(vector<string>::iterator iter = serversData.begin(); iter != serversData.end(); ++iter) {
-            vector<string> serverData = split(*iter, ":");
+            vector<string> serverData = bt->split(*iter, ":");
             servers[counter].hostName = serverData[0];
             servers[counter].hostIp = serverData[1];
             servers[counter].port = stoi(serverData[2]);
@@ -65,21 +73,6 @@ public:
         }
     }
 
-    vector<string> split(const string &str,const string &pattern) {
-        vector<string> resVec;
-        if (str.empty()) return resVec;
-        //方便截取最后一段数据
-        std::string strs = str + pattern;
-        size_t pos = strs.find(pattern), size = strs.size();
-        while (pos != string::npos) {
-            std::string x = strs.substr(0,pos);
-            resVec.push_back(x);
-            strs = strs.substr(pos+1, size);
-            pos = strs.find(pattern);
-        }
-        return resVec;
-    }
-    
 
     void showServers() {
         cout << "servers num is " << serverCounter << endl;
@@ -118,7 +111,7 @@ public:
     void disConnect() {
 
     }
-    
+/* 
     int Start() {
         if (getConnect() == -1) return -1;
         //pid = fork();
@@ -136,7 +129,7 @@ public:
         //disConnect();
         return 0;
     }
-    
+*/
     bool isExit(string order) {
         return order == "exit";
     }
@@ -158,10 +151,10 @@ public:
 };
 
 int main() {
-    unique_ptr<manager> daniel(new manager("servers.conf"));
+    unique_ptr<manager> daniel(new manager("conf/manager.conf"));
     daniel->showServers();
-    daniel->Start();
-    cout << "pid = " << daniel->getpid() << endl;
+    //daniel->Start();
+    //cout << "pid = " << daniel->getpid() << endl;
     //if (daniel->getpid()) daniel->sendOrder();
     
     return monitor::byebye();
