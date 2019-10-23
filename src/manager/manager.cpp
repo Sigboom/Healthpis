@@ -94,6 +94,7 @@ public:
 
     //子进程连接配置文件中所有服务器
     int getConnect() {
+        int success = 0; 
         cout << "Connect servers..." << endl;
         for (int i = 0; i < serverCounter; ++i) {
             string hostIp = servers[i].hostIp;
@@ -102,13 +103,15 @@ public:
             int connfd = -1;
             
             if ((connfd = socket_connect(port, hostIp.c_str())) == -1) {
+                cout << "try" << i + 1 << endl;
                 servers[i].errBuffer = "connect_server";
-                return -1;
+                continue;
             }
             send(connfd, checkMsg.c_str(), checkMsg.length(), 0);
             servers[i].connfd = connfd;
+            success++;
         }
-        return 0;
+        return success;
     }
 
     void disConnect() {
@@ -116,7 +119,7 @@ public:
     }
  
     int Start() {
-        if (getConnect() == -1) return -1;
+        if (getConnect() == 0) return -1;
         //pid = fork();
         //if (pid) return pid;
 
@@ -157,7 +160,7 @@ public:
 int main() {
     unique_ptr<manager> daniel(new manager("conf/manager.conf"));
     daniel->showServers();
-    //daniel->Start();
+    daniel->Start();
     //cout << "pid = " << daniel->getpid() << endl;
     //if (daniel->getpid()) daniel->sendOrder();
     
