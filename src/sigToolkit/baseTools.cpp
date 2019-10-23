@@ -40,19 +40,20 @@ string baseTools::getConf(string key) {
             int n = key.length() + 1;
             //找到对应key
             if (temp.find(key + "=") != string::npos) {
-                //cout << "catch key" << endl;
+                //cout << "catch key: " << key << endl;
                 //消除空格
                 while (temp[n] == ' ') n++;
-                //cout << "check temp " << temp << endl;
+                //cout << "check temp: " << temp << endl;
                 //数组判定
                 if (temp[n] == '[') {
                     if (*(temp.end() - 1) == ']') res = temp.substr(n + 1, temp.length() - 1);
                     else if(*(temp.end() - 1) == ';' && *(temp.end() - 2) == ']')
                         res = temp.substr(n + 1, temp.length() - 2);
                     else {
+                        res = temp.substr(n + 1);
                         while (!valueStream.eof()) {
-                            res = temp.substr(n + 1);
                             valueStream >> temp;
+                            //cout << "check temp:" << temp << endl;
                             if (*(temp.end() - 1) == ']') {
                                 res += temp.substr(0, temp.length() - 1);
                                 return res;
@@ -60,9 +61,11 @@ string baseTools::getConf(string key) {
                                 res += temp.substr(0, temp.length() - 2);
                                 return res;
                             } else res += temp;
+                            //cout << "check res: " << res << endl;
                         }
                     }
                 } else res = temp.substr(n);
+                //cout << "check return res: " << res << endl;
                 return res;
             }
         }

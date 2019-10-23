@@ -11,6 +11,8 @@
 #include "../include/baseTools.h"
 #include "../include/sigNet.h"
 
+#define MSGLEN 100
+
 using std::cin;
 using std::cout;
 using std::endl;
@@ -61,8 +63,9 @@ public:
     }
     ~manager() {}
     
-    void initServers(string serverDis) {
-        vector<string> serversData = bt->split(serverDis, ",");
+    void initServers(string serversDis) {
+        //cout << "serversDis: " << serversDis << endl;
+        vector<string> serversData = bt->split(serversDis, ",");
         int counter = 0;
         for(vector<string>::iterator iter = serversData.begin(); iter != serversData.end(); ++iter) {
             vector<string> serverData = bt->split(*iter, ":");
@@ -111,26 +114,27 @@ public:
     void disConnect() {
 
     }
-/* 
+ 
     int Start() {
         if (getConnect() == -1) return -1;
         //pid = fork();
         //if (pid) return pid;
 
         string recvBuffer = "";
-        while (!isExit(recvBuffer)) {
+        //while (!isExit(recvBuffer)) {
+        if (!isExit(recvBuffer)) { 
             recvBuffer.clear();
             cout << "I'm ready!" << endl;
-            int len = recv(servers[0].connfd, (void *)recvBuffer.c_str(), MAXLINE, 0);
-            if (len <= 0) break;
+            int len = recv(servers[0].connfd, (void *)recvBuffer.c_str(), MSGLEN, 0);
+            if (len <= 0) return 0;
             cout << recvBuffer;
             servers[0].recvBuffer = recvBuffer;
         }
         //disConnect();
         return 0;
     }
-*/
-    bool isExit(string order) {
+    
+    inline bool isExit(string order) {
         return order == "exit";
     }
 /* 
