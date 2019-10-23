@@ -1,13 +1,11 @@
 /*************************************************************************
-	> File Name: PCWindow.cpp
+	> File Name: test_branch.cpp
 	> Author: Doni Daniel
 	> Mail: sigboom@163.com
-	> Created Time: 三  8/28 19:05:09 2019
+	> Created Time: 二 10/22 10:47:07 2019
  ************************************************************************/
 
-#include "PCWindow.h"
-
-void PCWindow::drawContents() {
-    GetView()->DrawOn(this);
-}
+#include<iostream>
+using namespace std;
+kkkkkk
 
