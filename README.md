@@ -1,38 +1,45 @@
 # Sigheath
 making a project to control servers.
 
-##开始一个工程（18.7.15）
-1. 开发一个master和多个（可以上万）server的相互传输状态数据的程序 
-- 基础数据使用脚本文件
+##重新开始一个工程（19.10.25）
+###前言
+1. 由于一些原因，主要是因为我比较懒，没有进行整理。原来的项目目标没有实现，只留下好多散乱的代码，这段时间想整理一下这些代码，并使用C++来进行代码重写
+2. 实现的目标是能够实现对服务器状态的实时监控，以保证服务器的平稳运行
+3. 找了一个小伙伴，希望能一起实现
 
-##实现一部分功能（18.7.18）
-1. 单机master文件传输
-2. master多进程处理多机pi请求
-3. printf => DBG
-4. 日志实现master-client日志记录
 
-##尝试使用Django框架来完成一些事情
-1. 希望能对我的毕设有些帮助
-		
-2. 这是实现的基本目录结构
+###大体结构描述
+1. baseTools 基础的函数工具包，baseTools来实现配置文件的读取
+2. sigNet 基类，实现了Socket网络函数的相关封装，并做为两端基类
+3. manager manager端实现链接servers，并接收server相关系统信息
+4. server server端检查本机情况，链接并发送相关系统信息
 
-		├── __init__.py
-		├── __pycache__
-		│   ├── __init__.cpython-37.pyc
-		│   ├── admin.cpython-37.pyc
-		│   ├── models.cpython-37.pyc
-		│   └── views.cpython-37.pyc
-		├── admin.py
-		├── apps.py
-		├── migrations
-		│   ├── 0001_initial.py
-		│   ├── __init__.py
-		│   └── __pycache__
-		│       ├── 0001_initial.cpython-37.pyc
-		│       └── __init__.cpython-37.pyc
-		├── models.py
-		├── tests.py
-		└── views.py
-3. views.py内实现对窗口事件的处理
-4. models.py对后台数据库存储的定义
-5. tests.py存放一些测试
+###文件结构
+<table>
+	<tr>
+		<th rowspan="16">Sighealth</th>
+		<td rowspan="9">src</td>
+		<td>script</td>
+	</tr>
+	<tr><td>include</td><td>[*.h]</td></tr>
+	<tr><td rowspan="2">sigToolkit:sig工具包</td><td bgcolor="yellow">baseTools.cpp</td></tr>
+	<tr><td bgcolor="lightblue">sigNet.cpp[基类]</td></tr>
+	<tr><td rowspan="1">server</td><td>conf</td><td>server.conf</td></tr>
+	<tr><td rowspan="3">manager</td><td>conf</td><td>manager.conf</td></tr>
+	<tr><td bgcolor="orange">manager.cpp <b>[main]</b></td></tr>
+	<tr><td bgcolor="red">Makefile:manager</td></tr>
+	<tr><td>old:未分类文件</td></tr>
+	<tr><td rowspan="5">log</td><td>manager:</td><td>[servername]</td></tr>
+	<tr><td rowspan="4">server:</td><td>cpu.log</td></tr>
+	<tr><td>mem.log</td></tr>
+	<tr><td>disk.log</td></tr>
+	<tr><td>net.log</td></tr>
+	<tr><td>Makefile</td></tr>
+	<tr><td>README.md</td></tr>
+</table>
+
+###manager端
+1. 读取配置文件
+2. 进行网络链接
+
+###server端
