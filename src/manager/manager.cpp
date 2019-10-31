@@ -117,21 +117,21 @@ public:
         return success;
     }
 
-    void disConnect() {
-
+    void disConnect(int connfd) {
+        close(connfd);
+        return ;
     }
  
     int Start() {
         if (getConnect()) {
-            //sonPid = fork();
-            //if (sonPid) return sonPid;
-            sleep(3);
+            sonPid = fork();
+            if (sonPid) return sonPid;
         } else return -1;
 
 
         string recvBuffer = "";
-        //while (!isExit(recvBuffer)) {
-        if (!isExit(recvBuffer)) { 
+        while (!isExit(recvBuffer)) {
+        //if (!isExit(recvBuffer)) { 
             recvBuffer.clear();
             cout << "I'm ready!" << endl;
             int len = recv(servers[0].connfd, (void *)recvBuffer.c_str(), MSGLEN, 0);
@@ -139,7 +139,7 @@ public:
             cout << recvBuffer;
             servers[0].recvBuffer = recvBuffer;
         }
-        //disConnect();
+        disConnect(servers[0].connfd);
         return 0;
     }
     
@@ -148,12 +148,11 @@ public:
     }
  
     void sendOrder() {
-
         string sendBuffer;
         while (!isExit(sendBuffer)) {
             sendBuffer.clear();
-            std::cout << ">> ";
-            std::cin >> sendBuffer;
+            cout << ">> ";
+            cin >> sendBuffer;
             int len = send(servers[0].connfd, sendBuffer.c_str(), sendBuffer.length(), 0);
             if (len <= 0) break;
         }
@@ -168,9 +167,12 @@ public:
 int main() {
     unique_ptr<manager> daniel(new manager("conf/manager.conf"));
     daniel->showServers();
-    daniel->Start();
-    //cout << "pid = " << daniel->getSonPid() << endl;
-    //if (daniel->getSonPid()) daniel->sendOrder();
-    
+    int stat = 0;
+    if ((stat = daniel->Start())) {
+        cout << "net Start: " << stat << endl;
+    } else {
+        cout << "pid = " << daniel->getSonPid() << endl;
+        if (daniel->getSonPid()) daniel->sendOrder();
+    }
     return monitor::byebye();
 }
