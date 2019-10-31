@@ -18,6 +18,7 @@ using std::unique_ptr;
 using std::vector;
 using std::string;
 using std::move;
+using std::flush;
 
 namespace monitor {
     int byebye() {
@@ -122,18 +123,18 @@ public:
  
     int Start() {
         if (getConnect()) {
+            //如果开启接收则打开注释
             sonPid = fork();
             if (sonPid) return sonPid;
+            //return -1;
         } else return -1;
 
         string recvBuffer = "";
         while (!isExit(recvBuffer)) {
         //if (!isExit(recvBuffer)) { 
-            recvBuffer.clear();
-            cout << "I'm ready!" << endl;
             int len = recvMsg(servers[0].connfd, recvBuffer);
             if (len <= 0) return 0;
-            cout << recvBuffer;
+            cout << recvBuffer << flush;
             servers[0].recvBuffer = recvBuffer;
         }
         disConnect(servers[0].connfd);
@@ -165,7 +166,7 @@ int main() {
     unique_ptr<manager> daniel(new manager("conf/manager.conf"));
     daniel->showServers();
     int stat = 0;
-    if ((stat = daniel->Start())) {
+    if (stat == daniel->Start()) {
         cout << "net Start: " << stat << endl;
     } else {
         cout << "pid = " << daniel->getSonPid() << endl;

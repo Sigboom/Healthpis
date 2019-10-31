@@ -53,19 +53,18 @@ int sigNet::socket_connect(int port, string host) {
     return socketfd;
 }
 
-int sigNet::recvMsg(int connfd, string buffer, int msgLen, int args) {
-    char recvBuffer[msgLen + 1];
+int sigNet::recvMsg(int connfd, string &buffer, int msgLen, int args) {
+    char recvBuffer[msgLen];
     int n = recv(connfd, recvBuffer, msgLen, args);
     buffer.clear();
     buffer = recvBuffer;
     return n;
 }
 
-int sigNet::sendMsg(int connfd, string buffer, int msgLen, int args) {
+int sigNet::sendMsg(int connfd, string &buffer, int msgLen, int args) {
     if (msgLen == 0) msgLen = buffer.length() + 1;
     char sendBuffer[msgLen];
     strncpy(sendBuffer, buffer.c_str(), msgLen);
     int n = send(connfd, sendBuffer, msgLen, args);
-    buffer.clear();
     return n;
 }
