@@ -15,12 +15,16 @@
 #include <netinet/in.h> 
 #include <arpa/inet.h>
 
+#define MSGLEN 512
+
+using std::string;
+
 class sigNet {
 public:
-    //return  socketfd;
     int socket_create(int port);
-
-    int socket_connect(int port, std::string host);
+    int socket_connect(int port, string host);
+    int recvMsg(int connfd, string buffer, int msgLen = MSGLEN, int args = 0);
+    int sendMsg(int connfd, string buffer, int msglen = 0, int args = 0);
 };
 
 #endif

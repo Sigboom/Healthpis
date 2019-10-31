@@ -50,6 +50,22 @@ int sigNet::socket_connect(int port, string host) {
         perror("connect");
         return -1;
     } 
-
     return socketfd;
+}
+
+int sigNet::recvMsg(int connfd, string buffer, int msgLen, int args) {
+    char recvBuffer[msgLen + 1];
+    int n = recv(connfd, recvBuffer, msgLen, args);
+    buffer.clear();
+    buffer = recvBuffer;
+    return n;
+}
+
+int sigNet::sendMsg(int connfd, string buffer, int msgLen, int args) {
+    if (msgLen == 0) msgLen = buffer.length();
+    char sendBuffer[msgLen + 1];
+    int n = send(connfd, sendBuffer, msgLen, args);
+    buffer.clear();
+    buffer = sendBuffer;
+    return n;
 }

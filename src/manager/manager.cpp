@@ -11,8 +11,6 @@
 #include "../include/baseTools.h"
 #include "../include/sigNet.h"
 
-#define MSGLEN 100
-
 using std::cin;
 using std::cout;
 using std::endl;
@@ -109,7 +107,7 @@ public:
             }
             cout << "ready for send " << checkMsg << endl;
             int n = 0;
-            if ((n = send(connfd, checkMsg.c_str(), checkMsg.length(), 0)) < 0) cout << "send < 0" << endl;
+            if ((n = sendMsg(connfd, checkMsg) < 0)) cout << "send < 0" << endl;
             cout << "send over " << n << endl;
             servers[i].connfd = connfd;
             success++;
@@ -128,13 +126,12 @@ public:
             if (sonPid) return sonPid;
         } else return -1;
 
-
         string recvBuffer = "";
         while (!isExit(recvBuffer)) {
         //if (!isExit(recvBuffer)) { 
             recvBuffer.clear();
             cout << "I'm ready!" << endl;
-            int len = recv(servers[0].connfd, (void *)recvBuffer.c_str(), MSGLEN, 0);
+            int len = recvMsg(servers[0].connfd, recvBuffer);
             if (len <= 0) return 0;
             cout << recvBuffer;
             servers[0].recvBuffer = recvBuffer;
@@ -153,7 +150,7 @@ public:
             sendBuffer.clear();
             cout << ">> ";
             cin >> sendBuffer;
-            int len = send(servers[0].connfd, sendBuffer.c_str(), sendBuffer.length(), 0);
+            int len = sendMsg(servers[0].connfd, sendBuffer);
             if (len <= 0) break;
         }
         return ;
