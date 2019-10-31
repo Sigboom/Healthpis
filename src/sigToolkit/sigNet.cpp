@@ -62,10 +62,10 @@ int sigNet::recvMsg(int connfd, string buffer, int msgLen, int args) {
 }
 
 int sigNet::sendMsg(int connfd, string buffer, int msgLen, int args) {
-    if (msgLen == 0) msgLen = buffer.length();
-    char sendBuffer[msgLen + 1];
+    if (msgLen == 0) msgLen = buffer.length() + 1;
+    char sendBuffer[msgLen];
+    strncpy(sendBuffer, buffer.c_str(), msgLen);
     int n = send(connfd, sendBuffer, msgLen, args);
     buffer.clear();
-    buffer = sendBuffer;
     return n;
 }

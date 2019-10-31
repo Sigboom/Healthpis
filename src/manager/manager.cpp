@@ -107,7 +107,7 @@ public:
             }
             cout << "ready for send " << checkMsg << endl;
             int n = 0;
-            if ((n = sendMsg(connfd, checkMsg) < 0)) cout << "send < 0" << endl;
+            if ((n = sendMsg(connfd, checkMsg)) < 0) cout << "send < 0" << endl;
             cout << "send over " << n << endl;
             servers[i].connfd = connfd;
             success++;
