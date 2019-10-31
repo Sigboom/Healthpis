@@ -8,6 +8,7 @@
 #ifndef _BASETOOLS_H
 #define _BASETOOLS_H
 
+#include <unistd.h>
 #include <iostream>
 #include <fstream>
 #include <vector>

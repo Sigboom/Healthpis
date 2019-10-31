@@ -43,10 +43,10 @@ private:
     unique_ptr<ServerNode[]> servers;
     unique_ptr<baseTools> bt;
     int serverCounter;
-    int pid;
+    int sonPid;
     
 public:
-    manager(string confPath) : serverCounter(0) {
+    manager(string confPath) : serverCounter(0), sonPid(0) {
         unique_ptr<baseTools> b_temp (new baseTools(confPath));
         bt = move(b_temp);
         string str_temp = bt->getConf("num");
@@ -107,7 +107,10 @@ public:
                 servers[i].errBuffer = "connect_server";
                 continue;
             }
-            send(connfd, checkMsg.c_str(), checkMsg.length(), 0);
+            cout << "ready for send " << checkMsg << endl;
+            int n = 0;
+            if ((n = send(connfd, checkMsg.c_str(), checkMsg.length(), 0)) < 0) cout << "send < 0" << endl;
+            cout << "send over " << n << endl;
             servers[i].connfd = connfd;
             success++;
         }
@@ -119,9 +122,12 @@ public:
     }
  
     int Start() {
-        if (getConnect() == 0) return -1;
-        //pid = fork();
-        //if (pid) return pid;
+        if (getConnect()) {
+            //sonPid = fork();
+            //if (sonPid) return sonPid;
+            sleep(3);
+        } else return -1;
+
 
         string recvBuffer = "";
         //while (!isExit(recvBuffer)) {
@@ -140,20 +146,22 @@ public:
     inline bool isExit(string order) {
         return order == "exit";
     }
-/* 
+ 
     void sendOrder() {
-        while (!is_exit(send_buff)) {
-            send_buff.clear();
+
+        string sendBuffer;
+        while (!isExit(sendBuffer)) {
+            sendBuffer.clear();
             std::cout << ">> ";
-            std::cin >> send_buff;
-            int len = send(connfd, send_buff.c_str(), send_buff.length(), 0);
+            std::cin >> sendBuffer;
+            int len = send(servers[0].connfd, sendBuffer.c_str(), sendBuffer.length(), 0);
             if (len <= 0) break;
         }
         return ;
     }
-*/
-    int getpid() {
-        return this->pid;
+
+    int getSonPid() {
+        return this->sonPid;
     }
 };
 
@@ -161,8 +169,8 @@ int main() {
     unique_ptr<manager> daniel(new manager("conf/manager.conf"));
     daniel->showServers();
     daniel->Start();
-    //cout << "pid = " << daniel->getpid() << endl;
-    //if (daniel->getpid()) daniel->sendOrder();
+    //cout << "pid = " << daniel->getSonPid() << endl;
+    //if (daniel->getSonPid()) daniel->sendOrder();
     
     return monitor::byebye();
 }
