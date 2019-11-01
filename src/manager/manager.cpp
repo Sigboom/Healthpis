@@ -17,7 +17,6 @@ using std::endl;
 using std::unique_ptr;
 using std::vector;
 using std::string;
-using std::move;
 using std::flush;
 
 namespace monitor {
@@ -43,38 +42,23 @@ private:
     unique_ptr<baseTools> bt;
     int serverCounter;
     int sonPid;
-    
+    int stat;
+
 public:
-    manager(string confPath) : serverCounter(0), sonPid(0) {
-        unique_ptr<baseTools> b_temp (new baseTools(confPath));
-        bt = move(b_temp);
+    manager(string confPath) : serverCounter(0), sonPid(0), stat(0) {
+        bt = ([=](){return unique_ptr<baseTools> (new baseTools(confPath));})();
         string str_temp = bt->getConf("num");
         if (str_temp.empty()) {
             cout << "conf error!" << endl;
             exit(1);
         }
         serverCounter = std::stoi(str_temp);
-        unique_ptr<ServerNode[]> s_temp(new ServerNode[serverCounter]);
-        servers = move(s_temp);
+        servers = ([=](){return unique_ptr<ServerNode[]>(new ServerNode[serverCounter]);})();
         string serverDis = bt->getConf("servers");
         initServers(serverDis);
         cout << "manager init Successful!" << endl;
     }
-    ~manager() {}
-    
-    void initServers(string serversDis) {
-        //cout << "serversDis: " << serversDis << endl;
-        vector<string> serversData = bt->split(serversDis, ",");
-        int counter = 0;
-        for(vector<string>::iterator iter = serversData.begin(); iter != serversData.end(); ++iter) {
-            vector<string> serverData = bt->split(*iter, ":");
-            servers[counter].hostName = serverData[0];
-            servers[counter].hostIp = serverData[1];
-            servers[counter].port = stoi(serverData[2]);
-            counter++;
-        }
-    }
-
+    ~manager() {} 
 
     void showServers() {
         cout << "servers num is " << serverCounter << endl;
@@ -122,12 +106,11 @@ public:
     }
  
     int Start() {
-        if (getConnect()) {
-            //如果开启接收则打开注释
-            sonPid = fork();
-            if (sonPid) return sonPid;
-            //return -1;
-        } else return -1;
+        if (!getConnect()) return -1;
+        //如果开启接收则打开注释
+        sonPid = fork();
+        if (sonPid) return sonPid;
+        //return -1;
 
         string recvBuffer = "";
         while (!isExit(recvBuffer)) {
@@ -145,7 +128,7 @@ public:
         return order == "exit";
     }
  
-    void sendOrder() {
+    void Local() {
         string sendBuffer;
         while (!isExit(sendBuffer)) {
             sendBuffer.clear();
@@ -160,17 +143,35 @@ public:
     int getSonPid() {
         return this->sonPid;
     }
+
+    int getStat() {
+        return this->stat;
+    }
+
+private:
+    void initServers(string serversDis) {
+        //cout << "serversDis: " << serversDis << endl;
+        vector<string> serversData = bt->split(serversDis, ",");
+        int counter = 0;
+        for(vector<string>::iterator iter = serversData.begin(); iter != serversData.end(); ++iter) {
+            vector<string> serverData = bt->split(*iter, ":");
+            servers[counter].hostName = serverData[0];
+            servers[counter].hostIp = serverData[1];
+            servers[counter].port = stoi(serverData[2]);
+            counter++;
+        }
+    }
+    
 };
 
 int main() {
     unique_ptr<manager> daniel(new manager("conf/manager.conf"));
     daniel->showServers();
-    int stat = 0;
-    if (stat == daniel->Start()) {
-        cout << "net Start: " << stat << endl;
-    } else {
-        cout << "pid = " << daniel->getSonPid() << endl;
-        if (daniel->getSonPid()) daniel->sendOrder();
-    }
+    
+    daniel->Start();
+    if (daniel->getStat()) cout << "sys Stat: " << daniel->getStat() << endl;
+    else cout << "pid = " << daniel->getSonPid() << endl;
+    daniel->Local();
+    
     return monitor::byebye();
 }

@@ -13,7 +13,11 @@ using std::vector;
 using std::string;
 using std::ifstream;
 
-baseTools::baseTools(string confPath) : confPath(confPath) {}
+baseTools::baseTools(string confPath) : stat(0), confPath(confPath) {
+    ifstream valueStream(confPath);
+    if (valueStream.is_open()) valueStream.close();
+    else stat = -1;
+}
 
 vector<string> baseTools::split(const string &str,const string &pattern) {
     vector<string> resVec;
@@ -56,9 +60,11 @@ string baseTools::getConf(string key) {
                             //cout << "check temp:" << temp << endl;
                             if (*(temp.end() - 1) == ']') {
                                 res += temp.substr(0, temp.length() - 1);
+                                valueStream.close();
                                 return res;
                             } else if(*(temp.end() - 1) == ';' && *(temp.end() - 2) == ']') {
                                 res += temp.substr(0, temp.length() - 2);
+                                valueStream.close();
                                 return res;
                             } else res += temp;
                             //cout << "check res: " << res << endl;
@@ -66,6 +72,7 @@ string baseTools::getConf(string key) {
                     }
                 } else res = temp.substr(n);
                 //cout << "check return res: " << res << endl;
+                valueStream.close();
                 return res;
             }
         }

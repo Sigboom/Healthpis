@@ -14,15 +14,19 @@
 #include <vector>
 #include <string>
 
+using std::string;
+using std::vector;
+
 class baseTools {
 public:
-    baseTools(std::string confPath);
+    baseTools(string confPath);
     //切分字符串
-    std::vector<std::string> split(const std::string &str, const std::string &pattern);
+    vector<string> split(const string &str, const string &pattern);
 
-    std::string getConf(std::string key);
+    string getConf(string key);
 private:
-    std::string confPath;
+    int stat;
+    string confPath;
 };
 
 #endif
