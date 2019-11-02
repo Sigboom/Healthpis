@@ -9,14 +9,58 @@
 
 using std::cout;
 using std::endl;
+using std::map;
+using std::pair;
 using std::vector;
 using std::string;
 using std::ifstream;
+using std::size_t;
 
-baseTools::baseTools(string confPath) : stat(0), confPath(confPath) {
+using boost::trim;
+
+//stat == 0 配置文件加载无误
+//stat == -1 表明配置文件打开失败
+//stat == -2 表明配置文件内容有误
+
+baseTools::baseTools(string confPath) : confPath(confPath) {
     ifstream valueStream(confPath);
-    if (valueStream.is_open()) valueStream.close();
-    else stat = -1;
+    if (valueStream.is_open()) {
+        string temp, key, value;
+        size_t pos = 0;
+        while (!valueStream.eof()) {
+            valueStream >> temp;
+            trim(temp);
+            if(temp.length() == 0) continue;
+            if ((pos = temp.find("=")) != string::npos) {
+                key = temp.substr(0, pos);
+                value = temp.substr(pos + 1);
+                trim(key);
+                trim(value);
+                if (*(value.begin()) == '[') {
+                    if (*(value.end() - 1) != ']') {
+                        while (!valueStream.eof()) {
+                            valueStream >> temp;
+                            trim(temp);
+                            value += temp;
+                            if (*(temp.end() - 1) == ']' ||
+                                (temp.length() > 1 &&
+                                 *(temp.end() - 1) == ';' &&
+                                 *(temp.end() - 2) == ']')) break;
+                        }
+                    }
+                    value = value.substr(1, value.size() - 2);
+                }
+                confMap.insert(pair<string, string>(key, value));
+                key.clear();
+                value.clear();
+                temp.clear();
+            } else {
+                //cout << "error: " << temp << endl;
+                throw -2;
+            }
+        }
+        valueStream.close();
+    } else throw -1;
 }
 
 vector<string> baseTools::split(const string &str,const string &pattern) {
@@ -24,61 +68,21 @@ vector<string> baseTools::split(const string &str,const string &pattern) {
     if (str.empty()) return resVec;
     //方便截取最后一段数据
     string strs = str + pattern;
-    size_t pos = strs.find(pattern), size = strs.size();
+    size_t pos = strs.find(pattern);
     while (pos != string::npos) {
-        string x = strs.substr(0,pos);
+        string x = strs.substr(0, pos);
         resVec.push_back(x);
-        strs = strs.substr(pos+1, size);
+        strs = strs.substr(pos + 1);
         pos = strs.find(pattern);
     }
     return resVec;
 }
 
 string baseTools::getConf(string key) {
-    ifstream valueStream(confPath);
-    string temp, res;
-    if (valueStream.is_open()) {
-        //cout << "valueStream is open!" << endl;
-        while (!valueStream.eof()) {
-            valueStream >> temp;
-            int n = key.length() + 1;
-            //找到对应key
-            if (temp.find(key + "=") != string::npos) {
-                //cout << "catch key: " << key << endl;
-                //消除空格
-                while (temp[n] == ' ') n++;
-                //cout << "check temp: " << temp << endl;
-                //数组判定
-                if (temp[n] == '[') {
-                    if (*(temp.end() - 1) == ']') res = temp.substr(n + 1, temp.length() - 1);
-                    else if(*(temp.end() - 1) == ';' && *(temp.end() - 2) == ']')
-                        res = temp.substr(n + 1, temp.length() - 2);
-                    else {
-                        res = temp.substr(n + 1);
-                        while (!valueStream.eof()) {
-                            valueStream >> temp;
-                            //cout << "check temp:" << temp << endl;
-                            if (*(temp.end() - 1) == ']') {
-                                res += temp.substr(0, temp.length() - 1);
-                                valueStream.close();
-                                return res;
-                            } else if(*(temp.end() - 1) == ';' && *(temp.end() - 2) == ']') {
-                                res += temp.substr(0, temp.length() - 2);
-                                valueStream.close();
-                                return res;
-                            } else res += temp;
-                            //cout << "check res: " << res << endl;
-                        }
-                    }
-                } else res = temp.substr(n);
-                //cout << "check return res: " << res << endl;
-                valueStream.close();
-                return res;
-            }
-        }
-    } else {
-        cout << "Error opening file" << endl;
-        exit(1);
-    }
-    return res;
+    map<string, string>::iterator it = confMap.find(key);
+    if (it != confMap.end()) {
+        //cout << "key: " << key << " => " << confMap.find(key)->second << endl;
+        return it->second;
+    } else throw -3;
+    return "";
 }

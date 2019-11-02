@@ -13,20 +13,23 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <map>
+#include <boost/algorithm/string.hpp>
 
+using std::map;
 using std::string;
 using std::vector;
+using boost::trim;
 
 class baseTools {
 public:
     baseTools(string confPath);
     //切分字符串
     vector<string> split(const string &str, const string &pattern);
-
     string getConf(string key);
 private:
-    int stat;
     string confPath;
+    map<string, string> confMap;
 };
 
 #endif

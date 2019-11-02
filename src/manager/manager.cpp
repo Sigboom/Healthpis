@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "../include/confException.h"
 #include "../include/baseTools.h"
 #include "../include/sigNet.h"
 
@@ -18,6 +19,7 @@ using std::unique_ptr;
 using std::vector;
 using std::string;
 using std::flush;
+using std::stoi;
 
 namespace monitor {
     int byebye() {
@@ -46,17 +48,15 @@ private:
 
 public:
     manager(string confPath) : serverCounter(0), sonPid(0), stat(0) {
-        bt = ([=](){return unique_ptr<baseTools> (new baseTools(confPath));})();
-        string str_temp = bt->getConf("num");
-        if (str_temp.empty()) {
-            cout << "conf error!" << endl;
-            exit(1);
+        try {
+            bt = ([=](){return unique_ptr<baseTools> (new baseTools(confPath));})();
+            serverCounter = stoi(bt->getConf("num"));
+            servers = ([=](){return unique_ptr<ServerNode[]>(new ServerNode[serverCounter]);})();
+            initServers(bt->getConf("servers"));
+        } catch (int e) {
+            throw confException(e);
         }
-        serverCounter = std::stoi(str_temp);
-        servers = ([=](){return unique_ptr<ServerNode[]>(new ServerNode[serverCounter]);})();
-        string serverDis = bt->getConf("servers");
-        initServers(serverDis);
-        cout << "manager init Successful!" << endl;
+        cout << "manager init Successful!" << endl;    
     }
     ~manager() {} 
 
@@ -134,8 +134,9 @@ public:
             sendBuffer.clear();
             cout << ">> ";
             cin >> sendBuffer;
-            int len = sendMsg(servers[0].connfd, sendBuffer);
-            if (len <= 0) break;
+            //int len = sendMsg(servers[0].connfd, sendBuffer);
+            //if (len <= 0) break;
+            cout << sendBuffer << endl;
         }
         return ;
     }
@@ -165,13 +166,14 @@ private:
 };
 
 int main() {
-    unique_ptr<manager> daniel(new manager("conf/manager.conf"));
-    daniel->showServers();
-    
-    daniel->Start();
-    if (daniel->getStat()) cout << "sys Stat: " << daniel->getStat() << endl;
-    else cout << "pid = " << daniel->getSonPid() << endl;
-    daniel->Local();
-    
+    try {
+        unique_ptr<manager> daniel(new manager("conf/manager.conf"));
+        daniel->showServers();
+        daniel->Start();
+        cout << "pid = " << daniel->getSonPid() << endl;
+        daniel->Local();
+    } catch (confException e) {
+        e.show();
+    }
     return monitor::byebye();
 }
