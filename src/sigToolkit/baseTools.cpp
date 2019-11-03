@@ -18,10 +18,6 @@ using std::size_t;
 
 using boost::trim;
 
-//stat == 0 配置文件加载无误
-//stat == -1 表明配置文件打开失败
-//stat == -2 表明配置文件内容有误
-
 baseTools::baseTools(string confPath) : confPath(confPath) {
     ifstream valueStream(confPath);
     if (valueStream.is_open()) {

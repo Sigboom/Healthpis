@@ -18,17 +18,19 @@ making a project to control servers.
 <table>
 	<tr>
 		<th rowspan="16">Sighealth</th>
-		<td rowspan="9">src</td>
+		<td rowspan="11">src</td>
 		<td>script</td>
 	</tr>
-	<tr><td>include</td><td>[*.h]</td></tr>
-	<tr><td rowspan="2">sigToolkit:sig工具包</td><td bgcolor="yellow">baseTools.cpp</td></tr>
+	<tr><td>include:基础文件头</td><td>[*.h]</td></tr>
+	<tr><td rowspan="3">sigToolkit:sig工具包</td><td bgcolor="yellow">baseTools.cpp</td></tr>
+	<tr><td>confException.cpp</td></tr>
 	<tr><td bgcolor="lightblue">sigNet.cpp[基类]</td></tr>
 	<tr><td rowspan="1">server</td><td>conf</td><td>server.conf</td></tr>
 	<tr><td rowspan="3">manager</td><td>conf</td><td>manager.conf</td></tr>
 	<tr><td bgcolor="orange">manager.cpp <b>[main]</b></td></tr>
-	<tr><td bgcolor="red">Makefile:manager</td></tr>
-	<tr><td>old:未分类文件</td></tr>
+	<tr><td bgcolor="pink">Makefile => manager</td></tr>
+	<tr><td rowspan="2">old:旧版文件</td><td>client.c</td></tr>
+	<tr><td>mynet.h</td></tr>
 	<tr><td rowspan="5">log</td><td>manager:</td><td>[servername]</td></tr>
 	<tr><td rowspan="4">server:</td><td>cpu.log</td></tr>
 	<tr><td>mem.log</td></tr>
@@ -38,8 +40,19 @@ making a project to control servers.
 	<tr><td>README.md</td></tr>
 </table>
 
+###sigToolkit
+1. 提供配置文件读写函数
+2. 提供网络链接基类
+
+####配置优化点
+1. 将配置文件加载到内存替代每次都读内存【STL boost】
+
 ###manager端
-1. 读取配置文件
-2. 进行网络链接
+1. 读取配置文件[基本实现]
+2. 进行网络链接[未完成]
+
+####配置与优化点
+1. 使用lambda表达式与该智能指针将要析构时可以赋值操作的性质，替换使用move()【智能指针（unique_ptr）】
+2. 使用try-catch机制简化代码异常判断流程。【异常处理】
 
 ###server端

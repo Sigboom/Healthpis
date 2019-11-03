@@ -19,19 +19,8 @@ class confException {
 private:
     string msg;
 public:
-    confException(int error) {
-        switch(error) {
-            case -1: msg = "can't find conf file!"; break;
-            case -2: msg = "something error in conf file!"; break;
-            case -3: msg = "no such key in conf file!"; break;
-            default: msg = "understand error!!";
-        }
-    }
-
-    void show() {
-        cout << msg << endl;
-        return ;
-    }
+    confException(int error);
+    void show();
 };
 
 #endif
