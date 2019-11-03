@@ -116,12 +116,12 @@ public:
         while (!isExit(recvBuffer)) {
         //if (!isExit(recvBuffer)) { 
             int len = recvMsg(servers[0].connfd, recvBuffer);
-            if (len <= 0) return 0;
+            if (len <= 0) exit(0);
             cout << recvBuffer << flush;
             servers[0].recvBuffer = recvBuffer;
         }
         disConnect(servers[0].connfd);
-        return 0;
+        exit(0);
     }
     
     inline bool isExit(string order) {
