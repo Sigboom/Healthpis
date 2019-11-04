@@ -9,7 +9,13 @@
 
 using std::cout;
 using std::endl;
+using std::flush;
 using std::string;
+using std::thread;
+using std::vector;
+using std::ifstream;
+using std::ofstream;
+using std::initializer_list;
 
 int sigNet::socket_create(int port) {
     int socketfd;
@@ -67,4 +73,68 @@ int sigNet::sendMsg(int connfd, string &buffer, int msgLen, int args) {
     strncpy(sendBuffer, buffer.c_str(), msgLen);
     int n = send(connfd, sendBuffer, msgLen, args);
     return n;
+}
+
+void sigNet::th_sendFile(int socketfd, initializer_list<string> filePath) {
+    int connfd;
+    if ((connfd = accept(socketfd, (struct sockaddr *)NULL, NULL)) < 0) throw -4;
+    cout << "file connect successfully!" << endl;
+
+    for (auto ptr = filePath.begin(); ptr != filePath.end(); ++ptr) {
+        string msg = "send " + *ptr;
+        sendMsg(connfd, msg);
+        recvMsg(connfd, msg);
+        if (msg == "check") {
+            ifstream file(*ptr);
+            if (file.is_open()) {
+                string temp;
+                int n = 0;
+                while (!file.eof()) {
+                    file >> temp;
+                    n = sendMsg(connfd, temp);
+                    if (n <= 0) break;
+                }
+            }
+            file.close();
+        }
+    }
+    close(connfd);
+    close(socketfd);
+    exit(0);
+}
+
+int sigNet::h_sendFile(int filePort, initializer_list<string> filePath) {
+    int socketfd = socket_create(filePort);
+    
+    thread f_thread(th_sendFile, socketfd, filePath);
+    f_thread.detach();
+    return 0;
+}
+
+void sigNet::th_recvFile(int connfd, string filePath) {
+    string msg;
+    int pos = 0;
+    while (recvMsg(connfd, msg) > 0) {
+        if (msg == "END") break;
+        if ((pos = msg.find("send")) != string::npos) {
+            string logPath = filePath + msg.substr(pos + 5);
+            ofstream logFile(logPath);
+            msg = "check";
+            sendMsg(connfd, msg);
+            while(recvMsg(connfd, msg) > 0) {
+                if (msg == "EOF") break;
+                logFile << msg << flush;
+            }
+            logFile.close();
+        }
+    }
+    close(connfd);
+    exit(0);
+}
+
+int sigNet::recvFile(int filePort, string host, string filePath) {
+    int connfd = socket_connect(filePort, host);
+    thread f_thread(th_recvFile, connfd, filePath);
+    f_thread.detach();
+    return 0;
 }

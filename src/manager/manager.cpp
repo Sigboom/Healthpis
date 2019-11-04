@@ -113,12 +113,22 @@ public:
         //return -1;
 
         string recvBuffer = "";
+        string logPath = getConf("logPath");
+        int pos = 0;
         while (!isExit(recvBuffer)) {
         //if (!isExit(recvBuffer)) { 
             int len = recvMsg(servers[0].connfd, recvBuffer);
             if (len <= 0) exit(0);
             cout << recvBuffer << flush;
             servers[0].recvBuffer = recvBuffer;
+            if ((pos = servers[0].recvBuffer.find("ans_101")) != string::npos) {
+                string temp = servers[0].recvBuffer.substr(pos + 7);
+                cout << "port(String): " << temp << endl;
+                int filePort = stoi(temp);
+                string filePath = logPath + servers[0].hostName + "/";
+                cout << "log filePath: " << endl;
+                recvFile(filePort, servers[0].hostIp, filePath);
+            }
         }
         disConnect(servers[0].connfd);
         exit(0);
@@ -130,13 +140,16 @@ public:
  
     void Local() {
         string sendBuffer;
+        int pos = 0;
         while (!isExit(sendBuffer)) {
             sendBuffer.clear();
             cout << ">> ";
             cin >> sendBuffer;
-            //int len = sendMsg(servers[0].connfd, sendBuffer);
-            //if (len <= 0) break;
-            cout << sendBuffer << endl;
+            if ((pos = sendBuffer.find("send")) != string::npos) {
+                string temp = sendBuffer.substr(pos + 4);
+                int len = sendMsg(servers[0].connfd, temp);
+                if (len <= 0) break;
+            } else cout << sendBuffer << endl;
         }
         return ;
     }
