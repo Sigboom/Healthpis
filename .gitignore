@@ -2,3 +2,6 @@
 *.o
 *.exe
 *manager
+*server
+*.so
+*test.cpp
