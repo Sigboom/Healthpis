@@ -16,6 +16,7 @@ manager::manager(string confPath) : serverCounter(0), sonPid(0), stat(0) {
         } catch (int e) {
             throw confException(e);
         }
+        op = ([](){return unique_ptr<outPatient>(new outPatient());})();
         cout << "manager init Successful!" << endl;    
     }
 
@@ -96,21 +97,19 @@ int manager::Start() {
 }
 
 inline bool manager::isExit(string order) {
-    return order == "exit";
+    return order == "exit" || order == "quit";
 }
 
 void manager::Local() {
-    string sendBuffer;
-    int pos = 0;
-    while (!isExit(sendBuffer)) {
-        sendBuffer.clear();
+    string buffer;
+    while (true) {
+        buffer.clear();
         cout << ">> ";
-        cin >> sendBuffer;
-        if ((pos = sendBuffer.find("send")) != string::npos) {
-            string temp = sendBuffer.substr(pos + 4);
-            int len = sendMsg(servers[0].connfd, temp);
-            if (len <= 0) break;
-        } else cout << sendBuffer << endl;
+        cin >> buffer;
+        trim(buffer);
+        if (isExit(buffer)) break;
+        op->toRegister(buffer, servers);
+        op->treat();
     }
     return ;
 }
