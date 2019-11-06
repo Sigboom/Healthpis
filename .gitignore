@@ -1,7 +1,6 @@
 *.out
 *.o
 *.exe
-*manager
-*server
 *.so
 *test.cpp
+*.dSYM
