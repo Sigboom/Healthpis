@@ -21,7 +21,7 @@
 #include <thread>
 
 #define MSGLEN 512
-#define sendFile(port, ...) h_sendFile(port, { __VA_ARGS__ })
+#define sendFile(socket, ...) h_sendFile(socket, { __VA_ARGS__ })
 
 using std::string;
 using std::initializer_list;
@@ -32,7 +32,7 @@ public:
     int socket_connect(int port, string host);
     static int recvMsg(int connfd, string &buffer, int msgLen = MSGLEN, int args = 0);
     static int sendMsg(int connfd, string &buffer, int msglen = 0, int args = 0);
-    int h_sendFile(int filePort, initializer_list<string> filePath);
+    int h_sendFile(int socketfd, initializer_list<string> filePath);
     int recvFile(int filePort, string host, string filePath);
 private:
     static void th_sendFile(int connfd, initializer_list<string> filePath);

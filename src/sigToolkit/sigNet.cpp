@@ -103,9 +103,7 @@ void sigNet::th_sendFile(int socketfd, initializer_list<string> filePath) {
     exit(0);
 }
 
-int sigNet::h_sendFile(int filePort, initializer_list<string> filePath) {
-    int socketfd = socket_create(filePort);
-    
+int sigNet::h_sendFile(int socketfd, initializer_list<string> filePath) {
     thread f_thread(th_sendFile, socketfd, filePath);
     f_thread.detach();
     return 0;
