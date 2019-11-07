@@ -10,12 +10,17 @@
 
 using namespace std;
 
+class doctor;
+
 class patient {
-public:
+protected:
     string symptom;
 public:
     patient(){}
     patient(string talk): symptom(talk) {}
+    virtual ~patient(){}
+    
+    virtual shared_ptr<doctor> askDoctor() = 0;
     
     void show() {
         cout << symptom << endl;

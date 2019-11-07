@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include "manager.h"
+#include "myPatient.cpp"
 
 manager::manager(string confPath) : serverCounter(0), sonPid(0), stat(0) {
         try {
@@ -108,7 +109,7 @@ void manager::Local() {
         cin >> buffer;
         trim(buffer);
         if (isExit(buffer)) break;
-        op->toRegister(buffer);
+        op->toRegister(make_shared<myPatient>(buffer));
         op->treat();
     }
     return ;

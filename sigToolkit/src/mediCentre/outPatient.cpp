@@ -13,23 +13,21 @@ using std::shared_ptr;
 
 class outPatient {
 private:
-    patient pa;
     queue<shared_ptr<doctor> > dq;
-    sigDoctor doc;
+    
 public:
     outPatient() {}
     ~outPatient(){}
 
-    void toRegister(string sym) {
-        pa.setSym(sym);
-        shared_ptr<doctor> bookform = doc.check(pa);
-        dq.push(bookform);
+    void toRegister(shared_ptr<patient> pa) {
+        dq.push(pa->askDoctor());
         return ;
     }
 
     void treat() {
-        for(auto doc = dq.front(); !dq.empty(); dq.pop())
+        for(auto doc = dq.front(); !dq.empty(); dq.pop()) {
             doc->execute();
+        }
         return ;
     }
 };

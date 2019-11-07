@@ -11,10 +11,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../include/confException.h"
-#include "../include/baseTools.h"
-#include "../include/sigNet.h"
-#include "../include/mediCentre.h"
+#include "../../sigToolkit/include/sigToolkit.h"
 
 using std::cin;
 using std::cout;
