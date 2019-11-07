@@ -9,48 +9,90 @@
 #include <string>
 #include <queue>
 #include "manager.h"
+#include "patient.cpp"
 
+using std::cout;
+using std::endl;
 using std::string;
 using std::unique_ptr;
+using std::shared_ptr;
 using std::queue;
 
 class doctor {
 public:
-    virtual void accept() = 0;
+    virtual ~doctor(){}
+    virtual void execute() = 0;
 };
 
-class netDoctor : public doctor {
+class netDoctor: public doctor {
+private:
+    symptom sy;
+    unique_ptr<ServerNode> server;
 public:
-    netDoctor(string symptom) {}
-    void accept();
+    netDoctor(symptom sy, unique_ptr<ServerNode> &server): sy(sy) {
+        this->server = move(server);
+    }
+
+    void execute() {
+        sy.checknet();    
+        int len = sendMsg(server.connfd, sy.getSym());
+        if (len <= 0) return;
+        return ;
+    }
 };
 
-class cofDoctor : public doctor {
+
+class confDoctor: public doctor {
+private:
+    symptom sy;
+public:
+    confDoctor(symptom sy): sy(sy) {}
+    void execute() {
+        sy.checkconf();
+        return ;
+    }
+};
+
+class sigDoctor: public doctor {
+private:
+    patient pa;
+public:
+    sigDoctor(){}
+    sigDoctor(patient pa): pa(pa) {}
     
+    void execute() {
+        pa.show();
+        return ;
+    }
+
+    shared_ptr<doctor> check(patient pa) {
+        string sym = pa.getSym();
+        if (sym.find("send") != string::npos) {
+            sym = sym.substr(4);
+            return &(new netDoctor(*this, servers[0]));
+        }
+        return make_shared<sigDoctor>(*this);
+    }
 };
 
 class outPatient {
 private:
     queue<doctor> dq;
+    sigDoctor doc;
 public:
-    outPatient(){}
+    outPatient() {}
     ~outPatient(){}
 
-    void toRegister(string symptom, unique_ptr<ServerNode> &servers) { 
+    void toRegister(patient pa) { 
         int pos = 0;
-        if ((pos = symptom.find("send")) != string::npos) {
-            string temp = symptom.substr(pos + 4);
-            dq.push((new netDoctor(temp)));
-            int len = sendMsg(servers[0].connfd, temp);
-            if (len <= 0) return;
-        } else cout << symptom << endl;
+        shared_ptr<doctor> bookform = doc.check(pa);
+        dp.push(bookform);
         return ;
     }
 
     void treat() {
-        doctor *doc = dq.front();
-        dq.pop();
-        doc->accept();
+        for(doctor *doc = dq.front(); !dq.empty(); dq.pop())
+            doc->execute();
         return ;
     }
 };
