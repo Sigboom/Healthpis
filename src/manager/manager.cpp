@@ -108,7 +108,7 @@ void manager::Local() {
         cin >> buffer;
         trim(buffer);
         if (isExit(buffer)) break;
-        op->toRegister(buffer, servers);
+        op->toRegister(buffer);
         op->treat();
     }
     return ;

@@ -14,7 +14,7 @@
 #include "../include/confException.h"
 #include "../include/baseTools.h"
 #include "../include/sigNet.h"
-#include "mediCentre.cpp"
+#include "../include/mediCentre.h"
 
 using std::cin;
 using std::cout;

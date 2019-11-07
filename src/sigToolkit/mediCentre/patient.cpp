@@ -14,6 +14,7 @@ class patient {
 public:
     string symptom;
 public:
+    patient(){}
     patient(string talk): symptom(talk) {}
     
     void show() {
@@ -32,6 +33,11 @@ public:
 
     string getSym() {
         return this->symptom;
+    }
+
+    void setSym(string sym) {
+        this->symptom = sym;
+        return ;
     }
 };
 

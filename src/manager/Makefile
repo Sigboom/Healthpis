@@ -6,6 +6,11 @@ SigToolkit=../sigToolkit/
 
 Target=Sigpital_manager
 MAINCPP=Sigpital.cpp
+
+#exist = $(shell if [ -f $(LIBSPATH) ]; then echo "exist"; else echo "notexist"; fi;)
+#ifeq(exist, "notexist")
+#	mkdir $(LIBSPATH);
+#endif
 LIBS=${wildcard $(LIBSPATH)*.so}
 
 .PHONY: clean
