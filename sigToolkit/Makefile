@@ -5,7 +5,7 @@ LIBPATH=../../lib/
 
 Target=libsigToolkit.so
 ExceOBJS=confException.o
-OBJS=baseTools.o sigNet.o $(ExceOBJS)
+OBJS=baseTools.o sigNet.o mediCentre.o $(ExceOBJS)
 
 .PHONY: clean
 
@@ -21,6 +21,9 @@ sigNet.o: src/sigNet.cpp
 
 confException.o: src/confException.cpp
 	cd build && $(CC) $(CFLAGS) -c -o confException.o ../src/confException.cpp
+
+mediCentre.o: src/mediCentre.cpp
+	cd build && $(CC) $(CFLAGS) -c -o mediCentre.o ../src/mediCentre.cpp
 
 clean:
 	cd build && rm -f $(OBJS)

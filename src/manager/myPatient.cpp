@@ -19,6 +19,22 @@ public:
     }
 };
 
+class netDoctor: public doctor {
+public:
+    netDoctor(){}
+    ~netDoctor(){}
+
+    void execute() {
+        /*
+        sy.checknet();    
+        int len = sendMsg(server.connfd, sy.getSym());
+        if (len <= 0) return;
+        return ;
+        */
+        cout << "execute netDoctor" << endl;
+    }
+};
+
 class myPatient: public patient {
 public:
     myPatient(string talk) {

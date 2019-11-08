@@ -11,5 +11,6 @@
 #include "confException.h"
 #include "baseTools.h"
 #include "sigNet.h"
-#include "../src/mediCentre/outPatient.cpp"
+#include "mediCentre.h"
+
 #endif
