@@ -43,7 +43,7 @@ class manager : public sigNet {
 private:
     unique_ptr<ServerNode[]> servers;
     unique_ptr<baseTools> bt;
-    unique_ptr<outPatient> op;
+    unique_ptr<mediCentre> mc;
     int serverCounter;
     int sonPid;
     int stat;
@@ -65,6 +65,7 @@ public:
 
 private:
     void initServers(string serversDis);
+    void initLocal();
 };
 
 #endif

@@ -2,57 +2,50 @@
 	> File Name: mediCentre.h
 	> Author: Doni Daniel
 	> Mail: sigboom@163.com
-	> Created Time: 四 11/ 7 11:25:08 2019
+	> Created Time: 六 11/ 9 00:59:43 2019
  ************************************************************************/
 
 #ifndef _MEDICENTRE_H
 #define _MEDICENTRE_H
 
 #include <iostream>
+#include <list>
 #include <string>
-#include <queue>
 
-using std::string;
-using std::queue;
 using std::shared_ptr;
-
-class doctor;
-
-class patient {
-protected:
-    string symptom;
-public:
-    patient(){}
-    patient(string talk): symptom(talk) {}
-    virtual ~patient(){}
-    
-    virtual shared_ptr<doctor> askDoctor() = 0;
-    
-    string getSym() {
-        return this->symptom;
-    }
-
-    void setSym(string sym) {
-        this->symptom = sym;
-        return ;
-    }
-};
+using std::make_shared;
+using std::list;
+using std::string;
 
 class doctor {
-public:
-    virtual ~doctor(){}
-    virtual void execute() = 0;
-};
-
-class outPatient {
 private:
-    queue<shared_ptr<doctor> > dq;
-    
+    shared_ptr<doctor> nextDoctor;
 public:
-    outPatient();
-    ~outPatient();
-
-    void toRegister(shared_ptr<patient> pa);
-    void treat();
+    virtual ~doctor(){};
+    virtual void show();
+    //成功执行返回 1
+    virtual void execute(string sym) = 0;
+    void setNextDoctor(shared_ptr<doctor> nextDoctor);
+    shared_ptr<doctor> getNextDoctor();
 };
+
+
+class sigDoctor: public doctor {
+public:
+    void execute(string sym);
+};
+
+class mediCentre {
+private:
+    list<shared_ptr<doctor> > dList;
+
+public:
+    mediCentre();
+
+    void addDoctor(shared_ptr<doctor> newDoctor);    
+    void showDoctor();
+
+    void outPatient(string sym);
+};
+
 #endif

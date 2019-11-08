@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include "manager.h"
-#include "myPatient.cpp"
+#include "myDoctor.cpp"
 
 manager::manager(string confPath) : serverCounter(0), sonPid(0), stat(0) {
         try {
@@ -17,7 +17,7 @@ manager::manager(string confPath) : serverCounter(0), sonPid(0), stat(0) {
         } catch (int e) {
             throw confException(e);
         }
-        op = ([](){return unique_ptr<outPatient>(new outPatient());})();
+        initLocal();
         cout << "manager init Successful!" << endl;    
     }
 
@@ -109,8 +109,7 @@ void manager::Local() {
         cin >> buffer;
         trim(buffer);
         if (isExit(buffer)) break;
-        op->toRegister(make_shared<myPatient>(buffer));
-        op->treat();
+        mc->outPatient(buffer);
     }
     return ;
 }
@@ -134,4 +133,11 @@ void manager::initServers(string serversDis) {
         servers[counter].port = stoi(serverData[2]);
         counter++;
     }
+}
+
+void manager::initLocal() {
+    mc = ([](){return unique_ptr<mediCentre>(new mediCentre());})();
+    mc->addDoctor(make_shared<myDoctor>());
+    mc->addDoctor(make_shared<netDoctor>());
+    return ;
 }
