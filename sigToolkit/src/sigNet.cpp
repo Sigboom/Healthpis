@@ -74,7 +74,7 @@ int sigNet::sendMsg(int connfd, string &buffer, int msgLen, int args) {
     int n = send(connfd, sendBuffer, msgLen, args);
     return n;
 }
-
+/*
 void sigNet::th_sendFile(int socketfd, initializer_list<string> filePath) {
     int connfd;
     if ((connfd = accept(socketfd, (struct sockaddr *)NULL, NULL)) < 0) throw -4;
@@ -102,8 +102,9 @@ void sigNet::th_sendFile(int socketfd, initializer_list<string> filePath) {
     close(socketfd);
     exit(0);
 }
+*/
 
-void sigNet::th_sendFiles(int socketfd, vector<string> filePath) {
+void sigNet::pd_sendFile(int socketfd, vector<string> filePath) {
     int connfd;
     if ((connfd = accept(socketfd, (struct sockaddr *)NULL, NULL)) < 0) throw -4;
     cout << "file connect successfully!" << endl;
@@ -130,16 +131,18 @@ void sigNet::th_sendFiles(int socketfd, vector<string> filePath) {
     close(socketfd);
     exit(0);
 }
-int sigNet::sendFiles(int socketfd, vector<string> filePath) {
-    thread f_thread(th_sendFiles, socketfd, filePath);
-    f_thread.detach();
+
+int sigNet::sendFile(int socketfd, vector<string> filePath) {
+    int pid = fork();
+    if (pid) return pid;
+    pd_sendFile(socketfd, filePath);
     return 0;
 }
 
-int sigNet::h_sendFile(int socketfd, initializer_list<string> filePath) {
-    thread f_thread(th_sendFile, socketfd, filePath);
-    f_thread.detach();
-    return 0;
+int sigNet::sendFile(int socketfd, string filePath) {
+    vector<string> filesPath;
+    filesPath.push_back(filePath);
+    return sendFile(socketfd, filesPath);
 }
 
 void sigNet::th_recvFile(int connfd, string filePath) {
