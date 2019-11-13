@@ -21,7 +21,6 @@
 #include <thread>
 
 #define MSGLEN 512
-//#define sendFile(socket, ...) h_sendFile(socket, { __VA_ARGS__ })
 
 using std::string;
 using std::vector;

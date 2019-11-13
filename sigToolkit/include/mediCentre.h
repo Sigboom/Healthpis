@@ -11,41 +11,89 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <vector>
+#include "../include/baseTools.h"
+#include "../include/confException.h"
+#include "../include/serverException.h"
+#include "../include/sigNet.h"
 
 using std::shared_ptr;
+using std::unique_ptr;
 using std::make_shared;
 using std::list;
 using std::string;
+using std::vector;
+
+class mediCentre;
 
 class doctor {
-private:
+protected:
     shared_ptr<doctor> nextDoctor;
+
 public:
     virtual ~doctor(){};
     virtual void show();
-    //成功执行返回 1
     virtual void execute(string sym) = 0;
     void setNextDoctor(shared_ptr<doctor> nextDoctor);
-    shared_ptr<doctor> getNextDoctor();
+    shared_ptr<doctor> &getNextDoctor();
 };
 
 
 class sigDoctor: public doctor {
 public:
+    shared_ptr<mediCentre> mc;
+public:
+    sigDoctor(){}
+    sigDoctor(shared_ptr<mediCentre> mc): mc(mc) {}
+
     void execute(string sym);
+    
+private:
+    void connect(string station);
 };
 
-class mediCentre {
+typedef struct StationNode {
+    string hostName;
+    string hostIp;
+    int port;
+    string recvBuffer;
+    string sendBuffer;
+    string errBuffer;
+    int connfd;
+    int state;
+} StationNode;
+
+class mediCentre: public sigNet {
 private:
     list<shared_ptr<doctor> > dList;
-
+    unique_ptr<baseTools> bt;
+    unique_ptr<StationNode[]> stations;
+    int stationCounter;
+    
 public:
-    mediCentre();
+    mediCentre(string stationType, string confPath);
 
+    int catchStation(string stationName);
+    
+    void setSendBuffer(int id, string msg); 
+    void setErrBuffer(int id, string msg);
+    void setConnfd(int id, int connfd);
+    void setState(int id, int stat);
+
+    string getSendBuffer(int id);
+    string getHostIp(int id);
+    int getPort(int id);
+    int getConnfd(int id);
+    int getCounter();
+
+    int showStation();
     void addDoctor(shared_ptr<doctor> newDoctor);    
     void showDoctor();
-
+    
     void outPatient(string sym);
+
+private:
+    int initStation(string stationDes);
 };
 
 #endif

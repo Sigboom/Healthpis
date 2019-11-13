@@ -2,7 +2,7 @@ CC=g++
 CFLAGS=-g -Wall -std=c++11
 
 LIBSPATH=../../lib/
-SigToolkit=../../sigToolkit/
+SigToolkit=../../sigToolkit/build/
 
 Target=Sigpital_manager
 MAINCPP=Sigpital.cpp

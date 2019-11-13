@@ -16,11 +16,8 @@
 using std::cin;
 using std::cout;
 using std::endl;
-using std::unique_ptr;
-using std::vector;
 using std::string;
 using std::flush;
-using std::stoi;
 
 namespace monitor {
     int byebye() {
@@ -29,24 +26,10 @@ namespace monitor {
     }
 }
 
-typedef struct ServerNode {
-    string hostName;
-    string hostIp;
-    int port;
-    string recvBuffer;
-    string sendBuffer;
-    string errBuffer;
-    int connfd;
-} ServerNode;
-
 class manager : public sigNet {
 private:
-    unique_ptr<ServerNode[]> servers;
-    unique_ptr<baseTools> bt;
-    unique_ptr<mediCentre> mc;
-    int serverCounter;
+    shared_ptr<mediCentre> mc;
     int sonPid;
-    int stat;
 
 public:
     manager(string confPath);
@@ -55,7 +38,6 @@ public:
     int Start();
     void Local();
     
-    void showServers();
     int getConnect();
     void disConnect(int connfd);
     inline bool isExit(string order);
@@ -64,8 +46,7 @@ public:
     int getStat();
 
 private:
-    void initServers(string serversDis);
-    void initLocal();
+    void initDoctor();
 };
 
 #endif

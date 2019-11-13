@@ -74,35 +74,6 @@ int sigNet::sendMsg(int connfd, string &buffer, int msgLen, int args) {
     int n = send(connfd, sendBuffer, msgLen, args);
     return n;
 }
-/*
-void sigNet::th_sendFile(int socketfd, initializer_list<string> filePath) {
-    int connfd;
-    if ((connfd = accept(socketfd, (struct sockaddr *)NULL, NULL)) < 0) throw -4;
-    cout << "file connect successfully!" << endl;
-
-    for (auto ptr = filePath.begin(); ptr != filePath.end(); ++ptr) {
-        string msg = "send " + *ptr;
-        sendMsg(connfd, msg);
-        recvMsg(connfd, msg);
-        if (msg == "check") {
-            ifstream file(*ptr);
-            if (file.is_open()) {
-                string temp;
-                int n = 0;
-                while (!file.eof()) {
-                    file >> temp;
-                    n = sendMsg(connfd, temp);
-                    if (n <= 0) break;
-                }
-            }
-            file.close();
-        }
-    }
-    close(connfd);
-    close(socketfd);
-    exit(0);
-}
-*/
 
 void sigNet::pd_sendFile(int socketfd, vector<string> filePath) {
     int connfd;

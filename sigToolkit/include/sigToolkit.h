@@ -9,6 +9,7 @@
 #define _SIGTOOLKIT_H
 
 #include "confException.h"
+#include "serverException.h"
 #include "baseTools.h"
 #include "sigNet.h"
 #include "mediCentre.h"

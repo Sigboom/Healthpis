@@ -1,24 +1,25 @@
 /*************************************************************************
-	> File Name: confException.h
+	> File Name: serverException.h
 	> Author: Doni Daniel
 	> Mail: sigboom@163.com
-	> Created Time: 六 11/ 2 10:24:09 2019
+	> Created Time: 三 11/13 22:32:26 2019
  ************************************************************************/
 
-#ifndef _CONFEXCEPTION_H
-#define _CONFEXCEPTION_H
+#ifndef _SERVEREXCEPTION_H
+#define _SERVEREXCEPTION_H
 
 #include <iostream>
 #include <string>
 
 using std::string;
 
-class confException {
+class serverException {
 private:
     string msg;
 public:
-    confException(int error);
+    serverException();
     void show();
 };
 
 #endif
+
