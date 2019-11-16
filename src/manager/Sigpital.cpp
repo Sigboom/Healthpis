@@ -8,15 +8,13 @@
 #include "manager.cpp"
 
 int main() {
-    try {
-        unique_ptr<manager> daniel(new manager("conf/manager.conf"));
-        daniel->showServers();
-        daniel->Start();
-        cout << "pid = " << daniel->getSonPid() << endl;
-        daniel->Local();
-    } catch (confException e) {
-        e.show();
-    }
+    unique_ptr<manager> daniel(new manager("conf/manager.conf"));
+    
+    daniel->showStations();
+    daniel->Start();
+    cout << "pid = " << daniel->getSonPid() << endl;
+    daniel->Local();
+   
     return monitor::byebye();
 }
 

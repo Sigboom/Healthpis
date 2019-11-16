@@ -6,7 +6,7 @@ SRCPATH=../src/
 
 Target=libsigToolkit.so
 ExceOBJS=confException.o serverException.o
-OBJS=baseTools.o sigNet.o mediCentre.o $(ExceOBJS)
+OBJS=baseTools.o sigNet.o mediCentre.o doctor.o $(ExceOBJS)
 
 .PHONY: clean
 
@@ -24,6 +24,9 @@ confException.o: $(SRCPATH)confException.cpp
 
 serverException.o: $(SRCPATH)serverException.cpp
 	$(CC) $(CFLAGS) -c -o serverException.o $(SRCPATH)serverException.cpp
+
+doctor.o: $(SRCPATH)doctor.cpp
+	$(CC) $(CFLAGS) -c -o doctor.o $(SRCPATH)doctor.cpp
 
 mediCentre.o: $(SRCPATH)mediCentre.cpp
 	$(CC) $(CFLAGS) -c -o mediCentre.o $(SRCPATH)mediCentre.cpp

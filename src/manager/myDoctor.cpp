@@ -43,17 +43,30 @@ public:
 class fileDoctor: public doctor {
 private:
     shared_ptr<mediCentre> mc;
+    string logPath;
 
 public:
-    fileDoctor(shared_ptr<mediCentre> mc): mc(mc) {}
+    fileDoctor(shared_ptr<mediCentre> mc): mc(mc) {
+        logPath = mc->getLogPath();
+    }
     
     void execute(string sym) {
+        cout << "sym:" << sym << endl;
         int id = stoi(sym);
-        string buffer = mc->getSendBuffer(id);
-        regex expr("^[0-9]*$");
-        if (regex_match(buffer, expr)) {
+        string sendBuffer = mc->getSendBuffer(id);
+        string recvBuffer = mc->getRecvBuffer(id);
+        regex sendExpr("^[0-9]*$"), recvExpr("^ans_[0-9]*");
+        if (regex_match(sendBuffer, sendExpr)) {
             int connfd = mc->getConnfd(id);
-            mc->sendMsg(connfd, buffer);
+            mc->sendMsg(connfd, sendBuffer);
+        } 
+        if (regex_match(recvBuffer, recvExpr)) { 
+            string temp = recvBuffer.substr(7);
+            cout << "port(String): " << temp << endl;
+            int filePort = stoi(temp);
+            string filePath = logPath + mc->getHostName(id) + "/";
+            cout << "log filePath: " << filePath << endl;
+            mc->recvFile(filePort, mc->getHostIp(id), filePath);
         } else {
             getNextDoctor()->execute(sym);
         }
@@ -82,13 +95,16 @@ public:
         int pos = 0;
         if ((pos = sym.find(":")) != string::npos) {
             cout << "exec serverDoctor" << endl;
-            string server = sym.substr(0, pos);
+            string server = sym.substr(0, pos - 1);
+            bool send = (sym.substr(pos - 1, pos) == "<");
+            bool recv = (sym.substr(pos - 1, pos) == ">");
             string msg = sym.substr(pos + 1);
             trim(server);
             trim(msg);
             try {
                 int id = mc->catchStation(server);
-                mc->setSendBuffer(id, msg); 
+                if (send) mc->setSendBuffer(id, msg); 
+                if (recv) mc->setRecvBuffer(id, msg);
                 stringstream ssTemp;
                 ssTemp << id;
                 dList.front()->execute(ssTemp.str()); 

@@ -10,7 +10,7 @@
 
 manager::manager(string confPath) : sonPid(0) {
     try {
-       mc = make_shared<mediCentre>(new mediCentre("servers", confPath));
+       mc = make_shared<mediCentre>("servers", confPath);
     } catch (confException e) {
         e.show();
     }
@@ -20,11 +20,16 @@ manager::manager(string confPath) : sonPid(0) {
 
 manager::~manager() {} 
 
+void manager::showStations() {
+    mc->showStations();
+    return;
+}
+
 //子进程连接配置文件中所有服务器
 int manager::getConnect() {
     cout << "Connect servers..." << endl;
     mc->outPatient("connect all");
-    return mc->showStation();
+    return mc->showStations();
 }
 
 void manager::disConnect(int connfd) {
@@ -39,29 +44,19 @@ int manager::Start() {
     if (sonPid) return sonPid;
     //return -1;
 
+    //子进程应根据服务器数开辟多个线程
     string recvBuffer = "";
-    //string logPath = bt->getConf("logPath");
-    int pos = 0;
+    int id = 0;
     while (!isExit(recvBuffer)) {
-        int len = recvMsg(servers[0].connfd, recvBuffer);
+        int len = recvMsg(mc->getConnfd(id), recvBuffer);
         if (len <= 0) exit(0);
         cout << recvBuffer << flush;
-        string server = mc->getHostName(0);
-        servers[0].recvBuffer = recvBuffer;
-        string sym = server + ": " + recvBuffer;
+        string server = mc->getHostName(id);
+        mc->setRecvBuffer(id, recvBuffer);
+        string sym = server + ">:" + recvBuffer;
         mc->outPatient(sym);
-        
-        //fileDoctor
-        if ((pos = servers[0].recvBuffer.find("ans_101")) != string::npos) {
-            string temp = servers[0].recvBuffer.substr(pos + 7);
-            cout << "port(String): " << temp << endl;
-            int filePort = stoi(temp);
-            string filePath = logPath + servers[0].hostName + "/";
-            cout << "log filePath: " << endl;
-            recvFile(filePort, servers[0].hostIp, filePath);
-        }
     }
-    disConnect(servers[0].connfd);
+    disConnect(mc->getConnfd(id));
     exit(0);
 }
 
@@ -74,7 +69,8 @@ void manager::Local() {
     while (true) {
         buffer.clear();
         cout << ">> ";
-        cin >> buffer;
+        getline(cin, buffer);
+        if (!buffer.length()) continue;
         trim(buffer);
         if (isExit(buffer)) break;
         mc->outPatient(buffer);
@@ -88,6 +84,6 @@ int manager::getSonPid() {
 
 void manager::initDoctor() {
     mc->addDoctor(make_shared<myDoctor>());
-    mc->addDoctor(make_shared<netDoctor>());
+    mc->addDoctor(make_shared<serverDoctor>(mc));
     return ;
 }

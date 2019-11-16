@@ -12,10 +12,11 @@
 #include <list>
 #include <string>
 #include <vector>
-#include "../include/baseTools.h"
-#include "../include/confException.h"
-#include "../include/serverException.h"
-#include "../include/sigNet.h"
+#include "baseTools.h"
+#include "confException.h"
+#include "serverException.h"
+#include "sigNet.h"
+#include "doctor.h"
 
 using std::shared_ptr;
 using std::unique_ptr;
@@ -23,34 +24,6 @@ using std::make_shared;
 using std::list;
 using std::string;
 using std::vector;
-
-class mediCentre;
-
-class doctor {
-protected:
-    shared_ptr<doctor> nextDoctor;
-
-public:
-    virtual ~doctor(){};
-    virtual void show();
-    virtual void execute(string sym) = 0;
-    void setNextDoctor(shared_ptr<doctor> nextDoctor);
-    shared_ptr<doctor> &getNextDoctor();
-};
-
-
-class sigDoctor: public doctor {
-public:
-    shared_ptr<mediCentre> mc;
-public:
-    sigDoctor(){}
-    sigDoctor(shared_ptr<mediCentre> mc): mc(mc) {}
-
-    void execute(string sym);
-    
-private:
-    void connect(string station);
-};
 
 typedef struct StationNode {
     string hostName;
@@ -65,7 +38,7 @@ typedef struct StationNode {
 
 class mediCentre: public sigNet {
 private:
-    list<shared_ptr<doctor> > dList;
+    shared_ptr<sigDoctor> sd;
     unique_ptr<baseTools> bt;
     unique_ptr<StationNode[]> stations;
     int stationCounter;
@@ -76,17 +49,21 @@ public:
     int catchStation(string stationName);
     
     void setSendBuffer(int id, string msg); 
+    void setRecvBuffer(int id, string msg); 
     void setErrBuffer(int id, string msg);
     void setConnfd(int id, int connfd);
     void setState(int id, int stat);
 
     string getSendBuffer(int id);
+    string getRecvBuffer(int id);
+    string getHostName(int id);
     string getHostIp(int id);
     int getPort(int id);
     int getConnfd(int id);
     int getCounter();
+    string getLogPath();
 
-    int showStation();
+    int showStations();
     void addDoctor(shared_ptr<doctor> newDoctor);    
     void showDoctor();
     

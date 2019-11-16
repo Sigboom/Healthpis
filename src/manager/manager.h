@@ -37,6 +37,7 @@ public:
 
     int Start();
     void Local();
+    void showStations();
     
     int getConnect();
     void disConnect(int connfd);
