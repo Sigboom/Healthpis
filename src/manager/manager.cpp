@@ -13,6 +13,8 @@ manager::manager(string confPath) : sonPid(0) {
        mc = make_shared<mediCentre>("servers", confPath);
     } catch (confException e) {
         e.show();
+        cout << "manager init failed!" << endl;    
+        exit(1);
     }
     initDoctor();
     cout << "manager init Successful!" << endl;    

@@ -10,7 +10,6 @@
 int main() {
     unique_ptr<manager> daniel(new manager("conf/manager.conf"));
     
-    daniel->showStations();
     daniel->Start();
     cout << "pid = " << daniel->getSonPid() << endl;
     daniel->Local();

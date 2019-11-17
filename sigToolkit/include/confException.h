@@ -18,6 +18,7 @@ private:
     string msg;
 public:
     confException(int error);
+    confException(std::invalid_argument error);
     void show();
 };
 

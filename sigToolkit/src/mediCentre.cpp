@@ -17,11 +17,16 @@ mediCentre::mediCentre(string stationType, string confPath) {
         stationCounter = initStation(bt->getConf(stationType));
     } catch (int e) {
         throw confException(e);
+    } catch (std::invalid_argument e) {
+        throw confException(e);
+    } catch (...) {
+        cout << "some unknow exception in conf!" << endl;
     }
 }
 
 int mediCentre::initStation(string stationsDes) { 
     //cout << "get stationDes " << stationsDes << endl;
+    if (stationsDes.size() == 0) throw -4;
     vector<string> stationDes = bt->split(stationsDes, ",");
     stations = ([=](){return unique_ptr<StationNode[]>(new StationNode[stationDes.size()]);})();
     int i = 0;
