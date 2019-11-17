@@ -81,7 +81,6 @@ private:
 
 public:
     serverDoctor(shared_ptr<mediCentre> mc): mc(mc) {
-        dList.push_front(make_shared<sigDoctor>(mc)); 
         dList.push_front(make_shared<fileDoctor>(mc)); 
     }
 
@@ -93,6 +92,8 @@ public:
     
     void execute(string sym) {
         int pos = 0;
+        
+        //send or recv msg or file
         if ((pos = sym.find(":")) != string::npos) {
             cout << "exec serverDoctor" << endl;
             string server = sym.substr(0, pos - 1);
@@ -111,10 +112,45 @@ public:
             } catch (serverException e) {
                 e.show();
             }
-        } else {
-            getNextDoctor()->execute(sym);
+            return ;
         }
+        
+        //long connect
+        if (sym.find("connect ", 0, 8) != string::npos) {
+            string station = sym.substr(8);
+            connect(station);
+            return ;
+        }
+        getNextDoctor()->execute(sym);
         return ;
+    }
+
+private:
+    void connect(string station) {
+        //cout << "sigDoctor catch sym station: " << station << endl;
+        if (station == "all") {
+            //cout << "all OK!" << endl;
+            int counter = mc->getCounter();
+            for (int i = 0; i < counter; ++i) {
+                string hostIp = mc->getHostIp(i);
+                int port = mc->getPort(i);
+                string checkMsg = "SYN";
+                int connfd = -1;
+
+                if ((connfd = mc->socket_connect(port, hostIp.c_str())) == -1) {
+                    cout << "try" << i + 1 << endl;
+                    mc->setErrBuffer(i, "connect_server");
+                    mc->setState(i, -1);
+                    continue;
+                }
+                //cout << "ready for send " << checkMsg << endl;
+                int n = 0;
+                if ((n = mc->sendMsg(connfd, checkMsg)) < 0) cout << "send < 0" << endl;
+                cout << "send over " << n << endl;
+                mc->setConnfd(i, connfd);
+                mc->setState(i, 1);
+            }
+        }
     }
 };
 

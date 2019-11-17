@@ -29,57 +29,18 @@ void doctor::setNextDoctor(shared_ptr<doctor> nextDoctor) {
     return ;
 }
 
+#include "../include/doctorException.h"
+
 shared_ptr<doctor> &doctor::getNextDoctor() {
+    if (!this->nextDoctor) throw doctorException();
     return this->nextDoctor;
 }
 
-#include "../include/mediCentre.h"
-
-sigDoctor::sigDoctor() {
-    nextDoctor = make_shared<ExpDoctor>();
-    addDoctor(nextDoctor);
-}
-
-sigDoctor::sigDoctor(shared_ptr<mediCentre> mc): mc(mc) {
-    nextDoctor = make_shared<ExpDoctor>();
-    addDoctor(nextDoctor);
-}
-
-void sigDoctor::connect(string station) {
-    if (station == "all") {
-        int counter = mc->getCounter();
-        for (int i = 0; i < counter; ++i) {
-            string hostIp = mc->getHostIp(i);
-            int port = mc->getPort(i);
-            string checkMsg = "SYN";
-            int connfd = -1;
-            
-            if ((connfd = mc->socket_connect(port, hostIp.c_str())) == -1) {
-                cout << "try" << i + 1 << endl;
-                mc->setErrBuffer(i, "connect_server");
-                mc->setState(i, -1);
-                continue;
-            }
-            //cout << "ready for send " << checkMsg << endl;
-            int n = 0;
-            if ((n = mc->sendMsg(connfd, checkMsg)) < 0) cout << "send < 0" << endl;
-            cout << "send over " << n << endl;
-            mc->setConnfd(i, connfd);
-            mc->setState(i, 1);
-        }
-    }
-}
-
 void sigDoctor::execute(string sym) {
-    if (sym.find("connect ", 0, 8) != string::npos) {
-        string station = sym.substr(8);
-        connect(station);
-    } else 
+    try {
         dlist.front()->execute(sym);
+    } catch (doctorException e) {
+        e.show();
+    }
     return ;
-}
-
-void ExpDoctor::execute(string sym) {
-    cout << "symptom: " << sym  << " is unclear!" << endl;
-    return ; 
 }

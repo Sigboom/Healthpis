@@ -36,23 +36,9 @@ public:
 };
 
 
-class ExpDoctor: public doctor {
-public:
-    void execute(string sym);
-};
-
-
 class sigDoctor: public doctor {
 public:
-    shared_ptr<mediCentre> mc;
-public:
-    sigDoctor(); 
-    sigDoctor(shared_ptr<mediCentre> mc);
-
     void execute(string sym);
-    
-private:
-    void connect(string station);
 };
 
 #endif

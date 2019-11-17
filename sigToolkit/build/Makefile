@@ -5,12 +5,13 @@ LIBPATH=../../lib/
 SRCPATH=../src/
 
 Target=libsigToolkit.so
-ExceOBJS=confException.o serverException.o
+ExceOBJS=confException.o serverException.o doctorException.o
 OBJS=baseTools.o sigNet.o mediCentre.o doctor.o $(ExceOBJS)
 
 .PHONY: clean
 
 all: $(OBJS)
+	if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
 	$(CC) $(CFLAGS) -shared -fPIC -o $(LIBPATH)$(Target) $(OBJS)
 
 baseTools.o: $(SRCPATH)baseTools.cpp
@@ -21,6 +22,9 @@ sigNet.o: $(SRCPATH)sigNet.cpp
 
 confException.o: $(SRCPATH)confException.cpp
 	$(CC) $(CFLAGS) -c -o confException.o $(SRCPATH)confException.cpp
+
+doctorException.o: $(SRCPATH)doctorException.cpp
+	$(CC) $(CFLAGS) -c -o doctorException.o $(SRCPATH)doctorException.cpp
 
 serverException.o: $(SRCPATH)serverException.cpp
 	$(CC) $(CFLAGS) -c -o serverException.o $(SRCPATH)serverException.cpp

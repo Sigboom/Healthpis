@@ -110,6 +110,8 @@ string mediCentre::getRecvBuffer(int id) {
 }
 
 int mediCentre::getCounter() {
+
+    cout << "Successful getCounter:" << this->stationCounter << endl;
     return this->stationCounter;
 }
 
