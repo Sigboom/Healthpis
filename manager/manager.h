@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../../sigToolkit/include/sigToolkit.h"
+#include "../sigToolkit/include/sigToolkit.h"
 
 using std::cin;
 using std::cout;

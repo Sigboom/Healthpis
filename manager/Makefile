@@ -2,8 +2,8 @@ CC=g++
 boostlib=-lboost_regex
 CFLAGS=-g -Wall -std=c++11 $(boostlib)
 
-LIBSPATH=../../lib/
-SigToolkit=../../sigToolkit/build/
+LIBSPATH=../lib/
+SigToolkit=../sigToolkit/build/
 
 Target=Sigpital_manager
 MAINCPP=Sigpital.cpp
