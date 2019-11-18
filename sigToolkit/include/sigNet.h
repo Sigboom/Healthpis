@@ -24,21 +24,20 @@
 
 using std::string;
 using std::vector;
-using std::initializer_list;
 
 class sigNet {
 public:
     int socket_create(int port);
     int socket_connect(int port, string host);
+    
     static int recvMsg(int connfd, string &buffer, int msgLen = MSGLEN, int args = 0);
     static int sendMsg(int connfd, string &buffer, int msglen = 0, int args = 0);
     int sendFile(int socketfd, string filePath);
     int sendFile(int socketfd, vector<string> filePath);
-    //int h_sendFile(int socketfd, initializer_list<string> filePath);
     int recvFile(int filePort, string host, string filePath);
+    
 private:
     void pd_sendFile(int connfd, vector<string> filePath);
-//    static void th_sendFile(int connfd, initializer_list<string> filePath);
     static void th_recvFile(int connfd, string filePath);
 };
 
