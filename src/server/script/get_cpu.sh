@@ -6,4 +6,5 @@
 #########################################################################
 #!/bin/bash
 TopMessage=`top | head -n 4|tail -n 1`
-echo "${TopMessage}"
+
+echo "${TopMessage}" > 101

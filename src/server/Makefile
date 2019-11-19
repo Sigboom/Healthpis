@@ -1,25 +1,24 @@
 CC=g++
+CFLAGS=-g -Wall -std=c++11
 
-CFLAGS=-g -Wall
 
-OBJS=baseTools.o server.o sigNet.o
+LIBSPATH=../../lib/
+SigToolkit=../../sigToolkit/
+MAINCPP=main.cpp
 
-SigToolkit=../sigToolkit/
-Include=../include/
+Target=server
+
+LIBS=${wildcard $(LIBSPATH)*.so}
+
 
 .PHONY: clean
 
-server: $(OBJS)
-	$(CC) $(CFLAGS) -o server $(OBJS)
+$(Target): SigToolkits $(MAINCPP)
+	$(CC) $(CFLAGS) -o $(Target) $(MAINCPP) $(LIBS)
 
-baseTools.o: $(SigToolkit)baseTools.cpp $(Include)baseTools.h
-	$(CC) $(CFLAGS) -c -o baseTools.o $(SigToolkit)baseTools.cpp
-
-sigNet.o: $(SigToolkit)sigNet.cpp $(Include)sigNet.h
-	$(CC) $(CFLAGS) -c -o sigNet.o $(SigToolkit)sigNet.cpp
-
-server.o: server.cpp
-	$(CC) $(CFLAGS) -c -o server.o server.cpp
+SigToolkits:
+	@cd $(SigToolkit); make;
 
 clean:
-	rm -f $(OBJS) server 
+	rm -f $(OBJS) $(Target)
+
