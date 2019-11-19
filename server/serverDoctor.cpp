@@ -33,7 +33,7 @@ class serverDoctor : public doctor
 			temp = getsockname(socketfd,(struct sockaddr*)&sockAddr,&nlen);
 			port = ntohs(sockAddr.sin_port);
 			return port;
-}
+		}
 		void execute(string sys){
 			int len = sys.size();
 			if (1 == len){
@@ -45,10 +45,10 @@ class serverDoctor : public doctor
 				mc->sendFile(m_nTempSocked,sFilePath);
 			}
 			}else{
-			sys("./script/"+sys);
-			string sFilePath = "./script/"+sys;
-			mc->sendFile(m_nTempSocked,sFilePath);
-			
+				sys("./script/"+sys);
+				string sFilePath = "./script/"+sys;
+				mc->sendFile(m_nTempSocked,sFilePath);
+
 			}
 		}
 }
