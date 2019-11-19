@@ -15,7 +15,6 @@ using std::thread;
 using std::vector;
 using std::ifstream;
 using std::ofstream;
-using std::initializer_list;
 
 int sigNet::socket_create(int port) {
     int socketfd;
@@ -80,24 +79,25 @@ void sigNet::pd_sendFile(int socketfd, vector<string> filePath) {
     if ((connfd = accept(socketfd, (struct sockaddr *)NULL, NULL)) < 0) throw -4;
     cout << "file connect successfully!" << endl;
 
+    string msg;
     for (auto ptr = filePath.begin(); ptr != filePath.end(); ++ptr) {
-        string msg = "send " + *ptr;
+        msg = "send " + *ptr;
         sendMsg(connfd, msg);
         recvMsg(connfd, msg);
         if (msg == "check") {
             ifstream file(*ptr);
             if (file.is_open()) {
                 string temp;
-                int n = 0;
                 while (!file.eof()) {
-                    file >> temp;
-                    n = sendMsg(connfd, temp);
-                    if (n <= 0) break;
+                    getline(file, temp);
+                    if(sendMsg(connfd, temp) <= 0) break;
                 }
+                file.close();
             }
-            file.close();
         }
     }
+    msg = "END";
+    sendMsg(connfd, msg);
     close(connfd);
     close(socketfd);
     exit(0);
@@ -128,7 +128,7 @@ void sigNet::th_recvFile(int connfd, string filePath) {
             sendMsg(connfd, msg);
             while(recvMsg(connfd, msg) > 0) {
                 if (msg == "EOF") break;
-                logFile << msg << flush;
+                logFile << msg << endl;
             }
             logFile.close();
         }
