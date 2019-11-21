@@ -17,7 +17,6 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::string;
-using std::flush;
 
 namespace monitor {
     int byebye() {
@@ -26,7 +25,7 @@ namespace monitor {
     }
 }
 
-class manager : public sigNet {
+class manager {
 private:
     shared_ptr<mediCentre> mc;
     int sonPid;

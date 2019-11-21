@@ -34,8 +34,10 @@ int manager::getConnect() {
     return mc->showStations();
 }
 
-void manager::disConnect(int connfd) {
+void manager::disConnect(int id) {
+    int connfd = mc->getConnfd(id);
     close(connfd);
+    cout << mc->getHostName(id) << " disconnect." << endl;
     return ;
 }
 
@@ -50,15 +52,12 @@ int manager::Start() {
     string recvBuffer = "";
     int id = 0;
     while (!isExit(recvBuffer)) {
-        int len = recvMsg(mc->getConnfd(id), recvBuffer);
-        if (len <= 0) exit(0);
-        cout << recvBuffer << flush;
-        string server = mc->getHostName(id);
+        if (mc->recvMsg(mc->getConnfd(id), recvBuffer) <= 0) break;
+        cout << recvBuffer << endl;
         mc->setRecvBuffer(id, recvBuffer);
-        string sym = server + ">:" + recvBuffer;
-        mc->outPatient(sym);
+        mc->outPatient(mc->getHostName(id) + ">:" + recvBuffer);
     }
-    disConnect(mc->getConnfd(id));
+    disConnect(id);
     exit(0);
 }
 
