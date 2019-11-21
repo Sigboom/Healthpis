@@ -5,7 +5,7 @@
 	> Created Time: 二  10/ 22 17:52:21 2019
  ************************************************************************/
 
-#include "manager.h"
+#include "../include/manager.h"
 #include "myDoctor.cpp"
 
 manager::manager(string confPath) : sonPid(0) {
@@ -22,9 +22,8 @@ manager::manager(string confPath) : sonPid(0) {
 
 manager::~manager() {} 
 
-void manager::showStations() {
-    mc->showStations();
-    return;
+int manager::showStations() {
+    return mc->showStations();
 }
 
 //子进程连接配置文件中所有服务器
@@ -42,13 +41,19 @@ void manager::disConnect(int id) {
 }
 
 int manager::Start() {
-    if (!getConnect()) return -1;
+    int temp = getConnect();
+    cout << "temp:" << temp << endl;
+    if (!temp) return -1;
     //如果开启接收则打开注释
     sonPid = fork();
+    cout << "sonPid:" << sonPid << endl;
     if (sonPid) return sonPid;
     //return -1;
 
     //子进程应根据服务器数开辟多个线程
+    
+    cout << "fork over!" << endl;
+    
     string recvBuffer = "";
     int id = 0;
     while (!isExit(recvBuffer)) {

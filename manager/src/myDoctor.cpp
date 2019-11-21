@@ -76,20 +76,13 @@ public:
 
 class serverDoctor: public doctor {
 private:
-    list<shared_ptr<doctor> > dList;     
     shared_ptr<mediCentre> mc;
 
 public:
     serverDoctor(shared_ptr<mediCentre> mc): mc(mc) {
-        dList.push_front(make_shared<fileDoctor>(mc)); 
+        addDoctor(make_shared<fileDoctor>(mc)); 
     }
 
-    void addDoctor(shared_ptr<doctor> newDoctor) {
-        newDoctor->setNextDoctor(dList.front());
-        dList.push_front(newDoctor);
-        return ;
-    }
-    
     void execute(string sym) {
         int pos = 0;
         
@@ -108,7 +101,7 @@ public:
                 if (recv) mc->setRecvBuffer(id, msg);
                 stringstream ssTemp;
                 ssTemp << id;
-                dList.front()->execute(ssTemp.str()); 
+                dlist.front()->execute(ssTemp.str()); 
             } catch (serverException e) {
                 e.show();
             }
@@ -126,31 +119,36 @@ public:
     }
 
 private:
-    void connect(string station) {
-        //cout << "sigDoctor catch sym station: " << station << endl;
-        if (station == "all") {
-            //cout << "all OK!" << endl;
-            int counter = mc->getCounter();
-            for (int i = 0; i < counter; ++i) {
-                string hostIp = mc->getHostIp(i);
-                int port = mc->getPort(i);
-                string checkMsg = "SYN";
-                int connfd = -1;
+    void s_connect(int id) {
+        string hostName = mc->getHostName(id);
+        string hostIp = mc->getHostIp(id);
+        int port = mc->getPort(id);
+        string checkMsg = "SYN";
+        int connfd = -1;
 
-                if ((connfd = mc->socket_connect(port, hostIp.c_str())) == -1) {
-                    cout << "try" << i + 1 << endl;
-                    mc->setErrBuffer(i, "connect_server");
-                    mc->setState(i, -1);
-                    continue;
-                }
-                //cout << "ready for send " << checkMsg << endl;
-                int n = 0;
-                if ((n = mc->sendMsg(connfd, checkMsg)) < 0) cout << "send < 0" << endl;
-                cout << "send over " << n << endl;
-                mc->setConnfd(i, connfd);
-                mc->setState(i, 1);
-            }
+        cout << "try to connect " << hostName << endl;
+        if ((connfd = mc->socket_connect(port, hostIp.c_str())) == -1) {
+            mc->setErrBuffer(id, "connect_server");
+            mc->setState(id, -1);
+            return ;
         }
+        if (mc->sendMsg(connfd, checkMsg) < 0) cout << "send < 0" << endl;
+        mc->setConnfd(id, connfd);
+        mc->setState(id, 0);
+        cout << hostName << " connect successfully!" << endl;
+        return ;
+    }
+
+    void connect(string station) {
+        cout << "sigDoctor catch sym station: " << station << endl;
+        if (station == "all") {
+            int counter = mc->getCounter();
+            for (int id = 0; id < counter; ++id) s_connect(id);
+            return ;
+        }
+        int id = mc->catchStation(station);
+        s_connect(id);
+        return ;
     }
 };
 

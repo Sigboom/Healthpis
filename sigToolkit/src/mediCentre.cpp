@@ -52,7 +52,7 @@ int mediCentre::showStations() {
         if (stations[i].sendBuffer.empty()) cout << "    sendBuffer is empty" << endl;
         else cout << "    sendBuffer: " << stations[i].sendBuffer << endl;
         cout << "    stat: " << stations[i].state << endl;
-        if (!stations[i].state) counter++;
+        if (stations[i].state == 0) counter++;
     }
     cout << "]" << endl;
     return counter;
@@ -115,8 +115,7 @@ string mediCentre::getRecvBuffer(int id) {
 }
 
 int mediCentre::getCounter() {
-
-    cout << "Successful getCounter:" << this->stationCounter << endl;
+    //cout << "Successful getCounter:" << this->stationCounter << endl;
     return this->stationCounter;
 }
 
