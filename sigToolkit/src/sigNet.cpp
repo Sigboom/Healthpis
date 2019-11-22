@@ -84,11 +84,14 @@ void sigNet::pd_sendFile(int socketfd, vector<string> filePath) {
     for (auto ptr = filePath.begin(); ptr != filePath.end(); ++ptr) {
         msg = "send " + *ptr;
         sendMsg(connfd, msg);
+        cout << "have send filePath" << endl;
         recvMsg(connfd, msg);
         if (msg == "check") {
             ifstream file(*ptr);
             if (file.is_open()) {
                 string temp;
+
+                cout << "file is open and will send" << endl;
                 while (!file.eof()) {
                     getline(file, temp);
                     if(sendMsg(connfd, temp) <= 0) break;
@@ -97,8 +100,10 @@ void sigNet::pd_sendFile(int socketfd, vector<string> filePath) {
             }
         }
     }
+    cout << "will send END" << endl;
     msg = "END";
     sendMsg(connfd, msg);
+    cout << "process out!" << endl;
     close(connfd);
     close(socketfd);
     exit(0);
@@ -121,11 +126,14 @@ void sigNet::th_recvFile(int connfd, string filePath) {
     string msg;
     int pos = 0;
     while (recvMsg(connfd, msg) > 0) {
+        cout << "file recvMsg: " << msg << endl;
         if (msg == "END") break;
         if ((pos = msg.find("send")) != string::npos) {
             string logPath = filePath + msg.substr(pos + 5);
             ofstream logFile(logPath);
             msg = "check";
+            
+            cout << "will send check!" << endl;
             sendMsg(connfd, msg);
             while(recvMsg(connfd, msg) > 0) {
                 if (msg == "EOF") break;
@@ -133,13 +141,19 @@ void sigNet::th_recvFile(int connfd, string filePath) {
             }
             logFile.close();
         }
+        cout << "had recv file" << endl;
     }
+    cout << "thread out!" << endl;
     close(connfd);
     exit(0);
 }
 
 int sigNet::recvFile(int filePort, string host, string filePath) {
     int connfd = socket_connect(filePort, host);
+    if (connfd < 0) {
+        cout << "short connect error!" << endl;
+        return -1;
+    }
     thread f_thread(th_recvFile, connfd, filePath);
     f_thread.detach();
     return 0;

@@ -8,6 +8,7 @@
 #include <boost/regex.hpp>
 #include <iostream>
 #include <string>
+#include <dirent.h>
 
 using std::cout;
 using std::endl;
@@ -51,25 +52,37 @@ public:
     }
     
     void execute(string sym) {
-        cout << "sym:" << sym << endl;
         int id = stoi(sym);
         string sendBuffer = mc->getSendBuffer(id);
         string recvBuffer = mc->getRecvBuffer(id);
-        regex sendExpr("^[0-9]+$"), recvExpr("^ans_[1-9][0-9][1-9]");
+        regex sendExpr("^[0-9]+$"), recvExpr("^ans_[1-9][0-9][1-9] [1-9][0-9]*$");
+        cout << "will send:" << sendBuffer << endl;
+        cout << "will recv:" << recvBuffer << endl;
         if (regex_match(sendBuffer, sendExpr)) {
             int connfd = mc->getConnfd(id);
             mc->sendMsg(connfd, sendBuffer);
         } else if (regex_match(recvBuffer, recvExpr)) { 
-            string temp = recvBuffer.substr(7);
+            string temp = recvBuffer.substr(8);
             cout << "port(String): " << temp << endl;
             int filePort = stoi(temp);
             string filePath = logPath + mc->getHostName(id) + "/";
-            cout << "log filePath: " << filePath << endl;
+            mkdirPath(filePath);
+            cout << "checked filePath: " << filePath << endl;
             mc->recvFile(filePort, mc->getHostIp(id), filePath);
         } else {
             getNextDoctor()->execute(sym);
         }
         return ;
+    }
+
+private:
+    void mkdirPath(string path) {
+        DIR *dir = NULL; 
+        if ((dir = opendir(path.c_str())) == NULL) {
+            string commend = "mkdir -p " + path;
+            system(commend.c_str());
+        }
+        return;
     }
 };
 
@@ -87,13 +100,15 @@ public:
         
         //send or recv msg or file
         if ((pos = sym.find(":")) != string::npos) {
-            cout << "exec serverDoctor" << endl;
+            cout << "exec serverDoctor sym: " << sym << endl;
             string server = sym.substr(0, pos - 1);
-            bool send = (sym.substr(pos - 1, pos) == "<");
-            bool recv = (sym.substr(pos - 1, pos) == ">");
+            cout << "send or recv: " << sym[pos - 1] << endl;
+            bool send = (sym[pos - 1] == '<');
+            bool recv = (sym[pos - 1] == '>');
             string msg = sym.substr(pos + 1);
             trim(server);
             trim(msg);
+            cout << "server: " << server << ", msg: " << msg << endl;
             try {
                 int id = mc->catchStation(server);
                 if (send) mc->setSendBuffer(id, msg); 
@@ -131,7 +146,11 @@ private:
             mc->setState(id, -1);
             return ;
         }
-        if (mc->sendMsg(connfd, checkMsg) < 0) cout << "send < 0" << endl;
+        if (mc->sendMsg(connfd, checkMsg) <= 0) cout << "send < 0" << endl;
+        if (mc->recvMsg(connfd, checkMsg) <= 0) {
+            cout << "recv < 0" << endl;
+            mc->setErrBuffer(id, "connect_server2");
+        }
         mc->setConnfd(id, connfd);
         mc->setState(id, 0);
         cout << hostName << " connect successfully!" << endl;
