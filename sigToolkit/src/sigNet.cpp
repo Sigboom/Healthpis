@@ -71,6 +71,7 @@ int sigNet::sendMsg(int connfd, string &buffer, int msgLen, int args) {
     char sendBuffer[msgLen];
     strncpy(sendBuffer, buffer.c_str(), msgLen);
     int n = send(connfd, sendBuffer, msgLen, args);
+    buffer.clear();
     return n;
 }
 

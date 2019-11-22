@@ -55,12 +55,11 @@ public:
         int id = stoi(sym);
         string sendBuffer = mc->getSendBuffer(id);
         string recvBuffer = mc->getRecvBuffer(id);
-        regex sendExpr("^[0-9]*$"), recvExpr("^ans_[0-9]*");
+        regex sendExpr("^[0-9]+$"), recvExpr("^ans_[1-9][0-9][1-9]");
         if (regex_match(sendBuffer, sendExpr)) {
             int connfd = mc->getConnfd(id);
             mc->sendMsg(connfd, sendBuffer);
-        } 
-        if (regex_match(recvBuffer, recvExpr)) { 
+        } else if (regex_match(recvBuffer, recvExpr)) { 
             string temp = recvBuffer.substr(7);
             cout << "port(String): " << temp << endl;
             int filePort = stoi(temp);

@@ -58,7 +58,7 @@ int manager::Start() {
     int id = 0;
     while (!isExit(recvBuffer)) {
         if (mc->recvMsg(mc->getConnfd(id), recvBuffer) <= 0) break;
-        cout << recvBuffer << endl;
+        cout << "recvMsg: " << recvBuffer << endl;
         mc->setRecvBuffer(id, recvBuffer);
         mc->outPatient(mc->getHostName(id) + ">:" + recvBuffer);
     }
