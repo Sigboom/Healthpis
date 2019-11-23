@@ -29,19 +29,21 @@ using std::ostringstream;
 using std::ifstream;
 
 class Server : public sigNet {
-	private
+	private:
+		shared_ptr<mediCentre> mc;
 	public:
 		Server(string confPath);
 		~Server();
 
 	public:
+		void initDoctor();
 		void initServer(int port);
 		string readFileIntoString(string fileName);
 		void Start();
 		int getPort(int socketfd);
-		string handleRecv(string &recvData,int port);
 		void recvAndSendMessage(int connfd);
-	
+		inline bool isExit(string order);
+
 		int m_nPort;
 		int m_nSocketfd;
 		int m_nConnfd;
@@ -53,7 +55,6 @@ class Server : public sigNet {
 		queue<string> m_sRecvNews;
 		unique_ptr<baseTools> m_pBt;
 		vector<string> m_sFilePath;
-		unique_ptr<medCentre> mc;
 };
 
 #endif

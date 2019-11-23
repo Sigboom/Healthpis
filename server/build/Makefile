@@ -2,8 +2,8 @@ CC=g++
 CFLAGS=-g -Wall -std=c++11
 
 
-LIBSPATH=../lib/
-SigToolkit=../sigToolkit/build/
+LIBSPATH=../../lib/
+SigToolkit=../../sigToolkit/build/
 MAINCPP=main.cpp
 
 Target=server
