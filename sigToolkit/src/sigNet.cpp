@@ -82,7 +82,9 @@ void sigNet::pd_sendFile(int socketfd, vector<string> filePath) {
 
     string msg;
     for (auto ptr = filePath.begin(); ptr != filePath.end(); ++ptr) {
-        msg = "send " + *ptr;
+        int pos = 0;
+        pos = ptr->find_last_of("/");
+        msg = "send " + ptr->substr(pos + 1);
         sendMsg(connfd, msg);
         cout << "have send filePath" << endl;
         recvMsg(connfd, msg);
