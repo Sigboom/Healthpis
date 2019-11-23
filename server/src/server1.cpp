@@ -4,7 +4,7 @@
 	> Mail: sigboom@163.com 
 	> Created Time: 二 11/ 5 14:44:46 2019
  ************************************************************************/
-#include "server1.h"
+#include "../include/server1.h"
 #include "serverDoctor.cpp"
 
 Server::Server(string confPath)
@@ -18,6 +18,7 @@ Server::Server(string confPath)
 	}
 	initServer(mc->getPort(0));
 	cout << "Sever init Successful!" << endl;
+	initDoctor();
 }
 
 Server::~Server(){};
@@ -27,41 +28,7 @@ void Server::initServer(int port)
 	m_nSocketfd = socket_create(port);
 }
 
-int Server::getPort(int socketfd)
-{
-	struct sockaddr_in sockAddr;
-	socklen_t nlen = (socklen_t)sizeof(sockAddr);
-	int temp,port;
-	temp = getsockname(socketfd,(struct sockaddr*)&sockAddr,&nlen);
-	port = ntohs(sockAddr.sin_port);
-	return port;
-}
-
-string Server::handleRecv(string &recvData,int port)
-{
-	int len = recvData.size();
-	if ("SYN" == recvData){
-		string sBF = "ACK"; 
-		int sendVal = sendMsg(m_nConnfd,sBF);
-		close(m_nTempSocked);
-		return "SYN";
-	}
-	if ("exit" == recvData || "quit" == recvData){
-		m_sRecvNews.pop();
-		close(m_nTempConnfd);
-		return "exit";
-	}
-		string sBF = "ans_" + recvData + port;
-		int sendVal = sendMsg(m_nConnfd,sBF);
-	if (recvData[len-1] < '0' && recvData[len-1] > '9'){	
-		m_sRecvNews.push(""+recvData[0]);
-		return ""+recvData[0];
-	}
-	else{
-		m_sRecvNews.push(recvData);
-		return recvData;
-	}
-}
+/*
 
 void Server::recvAndSendMessage(int connfd)
 {
@@ -86,19 +53,32 @@ void Server::recvAndSendMessage(int connfd)
 			}
 		}	
 	return ;
-}
+}*/
 
 void Server::Start()
 {
 	if ((m_nConnfd = accept(m_nSocketfd,(struct sockaddr *)NULL,NULL)) < 0)
 		return ;
-	mc->outPatient("connect all");
+	mc->setConnfd(0,m_nConnfd);
 	cout << "-------------Connect Successfully---------" << endl;
-	initDoctor();
+	string recvBuffer = "";
+	int id = 0;
+	while(true){
+        int len = recvMsg(m_nConnfd, recvBuffer);
+        if (len <= 0) exit(0);
+        cout << recvBuffer << endl;
+        //string server = mc->getHostName(id);
+        //mc->setRecvBuffer(id, recvBuffer);
+        string sym =  recvBuffer;
+        mc->outPatient(sym);
+	}
+}
+inline bool Server::isExit(string order) {
+    return order == "exit" || order == "quit";
 }
 
 void Server::initDoctor()
 {
-    mc->addDoctor(make_shared<handleRecvDoctor>());
+    mc->addDoctor(make_shared<recvDoctor>(mc));
 
 }
