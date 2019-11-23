@@ -1,6 +1,7 @@
 CC=g++
 boostlib=-lboost_regex
-CFLAGS=-g -Wall -std=c++11
+DEBUG=NODEBUG
+CFLAGS=-g -Wall -std=c++11 -D$(DEBUG)
 
 LIBSPATH=../../lib/
 DOCTORPATH=../src/doctors/
@@ -25,8 +26,9 @@ doctor.o: $(DOCTORPATH)serverDoctor.cpp
 	$(CC) $(CFLAGS) -c -o doctor.o $(DOCTORPATH)serverDoctor.cpp
 
 SigToolkit:
-	@cd $(SigToolkit); make;
+	@cd $(SigToolkit); make DEBUG=$(DEBUG);
 
 clean:
 	rm -f $(OBJS) $(Target)
 	@cd $(SigToolkit); make clean;
+

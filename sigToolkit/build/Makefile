@@ -1,5 +1,6 @@
 CC=g++
-CFLAGS=-g -Wall -std=c++11
+DEBUG=NODEBUG
+CFLAGS=-g -Wall -std=c++11 -D$(DEBUG)
 
 LIBPATH=../../lib/
 SRCPATH=../src/

@@ -19,6 +19,9 @@ using std::size_t;
 using boost::trim;
 
 baseTools::baseTools(string confPath) : confPath(confPath) {
+#ifdef SIG_TEST
+    cout << "baseTools catch confPath: " << confPath << endl;
+#endif
     ifstream valueStream(confPath);
     if (valueStream.is_open()) {
         string temp, key, value;
@@ -57,6 +60,12 @@ baseTools::baseTools(string confPath) : confPath(confPath) {
         }
         valueStream.close();
     } else throw -1;
+#ifdef SIG_INIT
+    cout << "confMap read over!" << endl;
+    for (auto it = confMap.begin(); it != confMap.end(); ++it) {
+        cout << it->first << ": " << it->second << endl;
+    }
+#endif
 }
 
 vector<string> baseTools::split(const string &str,const string &pattern) {

@@ -16,11 +16,13 @@ namespace monitor {
 
 int main() {
     unique_ptr<manager> daniel(new manager("../conf/manager.conf"));
-    
+#ifndef SIG_INIT
     daniel->Start();
     cout << "pid = " << daniel->getSonPid() << endl;
     daniel->Local();
-   
+#else
+    
+#endif
     return monitor::byebye();
 }
 

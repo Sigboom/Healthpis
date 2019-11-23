@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include "../include/manager.h"
-#include "myDoctor.cpp"
+#include "../include/serverDoctor.h"
 
 manager::manager(string confPath) : sonPid(0) {
     try {
@@ -16,6 +16,9 @@ manager::manager(string confPath) : sonPid(0) {
         cout << "manager init failed!" << endl;    
         exit(1);
     }
+#ifdef SIG_INIT
+    cout << "mc init over!" << endl;
+#endif
     initDoctor();
     cout << "manager init Successful!" << endl;    
 }
@@ -89,7 +92,6 @@ int manager::getSonPid() {
 }
 
 void manager::initDoctor() {
-    mc->addDoctor(make_shared<myDoctor>());
     mc->addDoctor(make_shared<serverDoctor>(mc));
     return ;
 }

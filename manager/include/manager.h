@@ -18,13 +18,6 @@ using std::cout;
 using std::endl;
 using std::string;
 
-namespace monitor {
-    int byebye() {
-        std::cout << "Bye~Bye~" << std::endl;
-        return 0;
-    }
-}
-
 class manager {
 private:
     shared_ptr<mediCentre> mc;
