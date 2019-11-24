@@ -1,6 +1,7 @@
 CC=g++
 boostlib=-lboost_regex
-DEBUG=NODEBUG
+DEBUGKEY=SIG_
+DEBUG=FALSE
 CFLAGS=-g -Wall -std=c++11 -D$(DEBUG)
 
 LIBSPATH=../../lib/
@@ -16,8 +17,13 @@ LIBS=${wildcard $(LIBSPATH)*.so}
 
 .PHONY: clean
 
-$(Target): SigToolkit $(OBJS) $(MAINCPP)
+ifneq ($(findstring $(DEBUGKEY),$(DEBUG)),)
+all: SigToolkit $(OBJS) $(MAINCPP)
 	$(CC) $(CFLAGS) $(boostlib) -o $(Target) $(MAINCPP) $(OBJS) $(LIBS)
+else
+all: $(MAINCPP)
+	$(CC) $(CFLAGS) -o $(Target) $(MAINCPP)
+endif
 
 manager.o: $(MANAGERPATH)manager.cpp
 	$(CC) $(CFLAGS) -c -o manager.o $(MANAGERPATH)manager.cpp
