@@ -69,7 +69,7 @@ int main() {
     cout << "please use \"$ make DEBUG=SIG_... \"" << endl;
     cout << endl;
     cout << "---------------------------------------------------------" << endl;
-    cout << "| You can chose:"<< endl;
+    cout << "| You can choose:"<< endl;
     for (auto it = unit.begin(); it != unit.end(); ++it) {
         cout << "|    " << it->first << ": " << it->second << "   " << endl;
     }
