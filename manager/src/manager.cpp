@@ -59,18 +59,15 @@ int manager::Start() {
     
     string recvBuffer = "";
     int id = 0;
-    while (!isExit(recvBuffer)) {
+    int status = 0;
+    while (status != EXIT) {
         if (mc->recvMsg(mc->getConnfd(id), recvBuffer) <= 0) break;
         cout << "recvMsg: " << recvBuffer << endl;
         mc->setRecvBuffer(id, recvBuffer);
-        mc->outPatient(mc->getHostName(id) + ">:" + recvBuffer);
+        status = mc->outPatient(mc->getHostName(id) + ">:" + recvBuffer);
     }
     disConnect(id);
     exit(0);
-}
-
-inline bool manager::isExit(string order) {
-    return order == "exit" || order == "quit";
 }
 
 void manager::Local() {
@@ -78,11 +75,10 @@ void manager::Local() {
     while (true) {
         buffer.clear();
         cout << ">> ";
-        getline(cin, buffer);
+        mc->getline(cin, buffer);
         if (!buffer.length()) continue;
         trim(buffer);
-        if (isExit(buffer)) break;
-        mc->outPatient(buffer);
+        if(mc->outPatient(buffer) == EXIT) break;
     }
     return ;
 }

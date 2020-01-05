@@ -17,6 +17,7 @@
 #include "serverException.h"
 #include "sigNet.h"
 #include "doctor.h"
+#include "status.h"
 
 using std::shared_ptr;
 using std::unique_ptr;
@@ -24,6 +25,7 @@ using std::make_shared;
 using std::list;
 using std::string;
 using std::vector;
+using std::iostream;
 
 typedef struct StationNode {
     string hostName;
@@ -41,12 +43,20 @@ private:
     shared_ptr<sigDoctor> sd;
     unique_ptr<baseTools> bt;
     unique_ptr<StationNode[]> stations;
+    vector<string> logs;
     int stationCounter;
+    int lognum;
     
 public:
     mediCentre(string stationType, string confPath);
 
+    int outPatient(string sym);
+    void addDoctor(shared_ptr<doctor> newDoctor);    
+    void getline(iostream in, string buffer);
+
     int catchStation(string stationName);
+    int showStations();
+    void showDoctor();
     
     void setSendBuffer(int id, string msg); 
     void setRecvBuffer(int id, string msg); 
@@ -63,14 +73,11 @@ public:
     int getCounter();
     string getLogPath();
 
-    int showStations();
-    void addDoctor(shared_ptr<doctor> newDoctor);    
-    void showDoctor();
-    
-    void outPatient(string sym);
-
 private:
     int initStation(string stationDes);
+    string upSearchLog();
+    string downSearchLog();
+    inline bool isExit(string order);
 };
 
 #endif

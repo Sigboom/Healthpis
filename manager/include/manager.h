@@ -33,7 +33,6 @@ public:
     
     int getConnect();
     void disConnect(int connfd);
-    inline bool isExit(string order);
 
     int getSonPid();
     int getStat();

@@ -9,6 +9,7 @@
 
 using std::cout;
 using std::endl;
+using std::iostream;
 
 mediCentre::mediCentre(string stationType, string confPath) {
     sd = make_shared<sigDoctor>();
@@ -38,6 +39,45 @@ int mediCentre::initStation(string stationsDes) {
         ++i;
     }
     return stationDes.size();
+}
+
+void upSearchLog() {
+    //lognum from mow to 0;
+    //lognum--;
+}
+
+void downSearchLog() {
+    //lognum from now to max;
+    //lognum++;
+}
+
+void mediCentre::getline(iostream in, string buffer) {
+    char charHead = ' ';
+    char headCheck[2];
+    while (charHead == ' ' || charHead == '\n') {
+        charHead = getchar();
+    }
+    if (charHead == 27) {
+        headCheck[0] = getchar();
+        if (headCheck[0] == '[') {
+            headCheck[1] = getchar();
+            switch(headCheck[1]) {
+                case 'A':
+                    cout << upSearchLog();
+                    break;
+                case 'B':
+                    cout << downSearchLog();
+                    break;
+                default: 
+                    cout << headCheck[1] << endl;
+                    return ;
+            }
+        }
+    } else {
+        buffer[0] = charHead; 
+        getline(in, buffer[1]);
+    } 
+    return ;
 }
 
 int mediCentre::showStations() {
@@ -71,9 +111,14 @@ void mediCentre::showDoctor() {
     return ;
 }
 
-void mediCentre::outPatient(string sym) {
+inline bool mediCentre::isExit(string order) {
+    return order == "exit" || order == "quit";
+}
+
+int mediCentre::outPatient(string sym) {
+    if (isExit(sym)) return EXIT;
     sd->execute(sym);
-    return ;
+    return 0;
 }
 
 int mediCentre::catchStation(string stationName) {
