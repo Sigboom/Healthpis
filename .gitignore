@@ -5,3 +5,4 @@
 *test.cpp
 *.dSYM
 Sigpital_manager
+*.DS_Store

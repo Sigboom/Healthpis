@@ -17,7 +17,7 @@ namespace monitor {
 int main() {
     unique_ptr<manager> daniel(new manager("../conf/manager.conf"));
     
-    daniel->Start();
+    daniel->Start()
     cout << "pid = " << daniel->getSonPid() << endl;
     daniel->Local();
    
